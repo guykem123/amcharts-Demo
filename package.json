@@ -17,8 +17,6 @@
     "@amcharts/amcharts4-geodata": "^4.1.15",
     "@angular/animations": "~9.1.9",
     "@angular/common": "~9.1.9",
-    "@angular/cli": "^10.0.0",
-    "@angular/compiler-cli": "^9.1.11",
     "@angular/core": "~9.1.9",
     "@angular/forms": "~9.1.9",
     "@angular/platform-browser": "~9.1.9",
