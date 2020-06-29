@@ -7,11 +7,13 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "heroku-postbuild": "ng build --prod",
+    "postinstall": "ng build -prod",
     "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
+    "@angular/cli": "^10.0.0",
+    "@angular/compiler-cli": "^9.1.11",
     "@amcharts/amcharts4": "^4.9.27",
     "@amcharts/amcharts4-fonts": "^4.0.1",
     "@amcharts/amcharts4-geodata": "^4.1.15",
@@ -27,15 +29,11 @@
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "typescript": "~3.8.3",
-    "@angular/cli": "^10.0.0",
-    "@angular/compiler-cli": "^9.1.11",
     "zone.js": "~0.10.2"
   },
-  "engines": {
-    "node": "12.16.1",
-    "npm": "6.14.5"
-  },
   "devDependencies": {
+    "@angular/cli": "^10.0.0",
+    "@angular/compiler-cli": "^9.1.11",
     "@angular-devkit/build-angular": "~0.901.7",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
@@ -53,5 +51,9 @@
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~3.8.3"
-  }
+  },
+  "engines": {
+    "node": "12.16.1",
+    "npm": "6.14.5"
+  },
 }
