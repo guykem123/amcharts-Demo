@@ -3,6 +3,11 @@
 </div>
 
 <div class="graph">
+  <select [(ngModel)]="dataDispaly.name" (change)="changeSelect()">
+    <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
+      {{ opt.name }}
+    </option>
+  </select>
   <app-stack-vert-chart></app-stack-vert-chart>
 </div>
 <div class="graph">
