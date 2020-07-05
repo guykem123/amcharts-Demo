@@ -17,7 +17,16 @@ export class StackVertDataService {
   constructor(private dataService: DataService) {
     this.projects = {
       name: "Projects",
-      data: dataService.projectsData,
+      data: dataService.projectsData.map(obj => {
+        const values = Object.values(obj)
+        let total = 0
+        values.forEach(element => {
+          if (element && typeof (element) == "number") {
+            total += element
+          }
+        });
+        return { ...obj, total }
+      }),
       display: {
         yAxis: Object.keys(dataService.projectsData[0]).find(x => !x.includes("Project")),
         xAxis: Object.keys(dataService.projectsData[0]).filter(x => x.includes("Project")),

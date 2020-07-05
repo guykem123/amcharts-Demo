@@ -12,7 +12,7 @@ export class DataService {
       "Project C": 44655,
       "Project D": 13922,
       "Project E": 44655,
-      "Project F": 13922,
+      "Project F": 32093,
     },
     {
       "year": "2000",
@@ -62,7 +62,7 @@ export class DataService {
       "Service F": 3000,
     }
   ]
-  locationData:any[] =[
+  locationData: any[] = [
     {
       "Month": "April",
       "USA": 1992,

@@ -18,11 +18,12 @@ export class FirstGraphComponent implements OnInit {
     "year": 2005,
     "income": 23.5,
     "expenses": 18.1,
-    "worker": 20
+    "total": 100
   }, {
     "year": 2006,
     "income": 26.2,
-    "expenses": 22.8
+    "expenses": 22.8,
+    "total": 110
   }, {
     "year": 2007,
     "income": 30.1,
@@ -54,14 +55,15 @@ export class FirstGraphComponent implements OnInit {
     valueAxis.renderer.opposite = true;
     valueAxis.renderer.grid.template.strokeOpacity = 0;
     valueAxis.min = 0
-    valueAxis.renderer.grid.template.disabled = true;
-    valueAxis.renderer.labels.template.disabled = true;
+    // valueAxis.renderer.grid.template.disabled = true;
+    // valueAxis.renderer.labels.template.disabled = true;
 
 
     function createSeries(field, name, chart) {
       let series: ColumnSeries = chart.series.push(new ColumnSeries());
       series.clickable = true;
       series.dataFields.valueX = field;
+      (<any>series).dataFields.total = "total";
       series.hiddenState.transitionDuration = 400;
       series.dataFields.categoryY = "year";
       series.name = name;
@@ -78,7 +80,7 @@ export class FirstGraphComponent implements OnInit {
 
       let valueLabel = series.bullets.push(new LabelBullet());
       valueLabel.userClassName = "abc"
-      valueLabel.label.text = "{valueX}";
+      valueLabel.label.text = "{total}";
       valueLabel.label.horizontalCenter = "left";
       valueLabel.label.dx = 10;
       valueLabel.label.hideOversized = false;
@@ -88,7 +90,7 @@ export class FirstGraphComponent implements OnInit {
     }
 
     createSeries("income", "Income", this.chart);
-    createSeries("expenses", "Expenses", this.chart);
+    createSeries("expenses", "Xxpenses", this.chart);
 
   }
 
@@ -97,7 +99,7 @@ export class FirstGraphComponent implements OnInit {
     if (this.incomeState)
       s.hide()
     else
-      s.appear()
+      s.show()
     this.incomeState = !this.incomeState
   }
   changeExpensesState() {
@@ -115,8 +117,8 @@ function setYAxes(chart: XYChart) {
   categoryAxis.numberFormatter.numberFormat = "#";
   categoryAxis.renderer.inversed = true;
   categoryAxis.renderer.grid.template.strokeOpacity = 0;
-  categoryAxis.renderer.grid.template.disabled = true;
-  categoryAxis.renderer.labels.template.disabled = true;
+  // categoryAxis.renderer.grid.template.disabled = true;
+  // categoryAxis.renderer.labels.template.disabled = true;
 }
 
 function setLegend(chart: XYChart) {
