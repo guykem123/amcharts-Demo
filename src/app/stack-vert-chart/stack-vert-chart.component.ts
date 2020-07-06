@@ -38,15 +38,13 @@ export class StackVertChartComponent implements OnInit {
     removeOldAxisData(chart);
     let categoryAxis: CategoryAxis = this.setXAxis(chart, dataDisplay);
     //change tooltipText data
-    categoryAxis.adapter.add("getTooltipText", (a, e, k) => {
-      return this.columnText;
-    });
     setXAxisTooltip(categoryAxis, chart);
     setYAxis(chart);
 
     removeOldSeries(chart);
     this.setSeries(dataDisplay);
     addLegend(chart);
+
   }
 
   private setSeries(dataDisplay: any) {
@@ -59,17 +57,44 @@ export class StackVertChartComponent implements OnInit {
   }
   private setSerieOnColumnOverEv(serie: ColumnSeries, dataDisplay) {
     serie.columns.template.events.on("over", (e) => {
-      this.columnText = ""
       const year = (<any>e.target.dataItem).categoryX
+      const series = this.chart.series.values
+      let str = ``
+
+      str = `
+      <div style ="background-color:white">
+      <center><strong style ="color:black;">YEAR ${year}</strong></center>
+        <hr />
+          <table>`
+
       const obj = dataDisplay.data.find(x => x["year"] == year)
+      if (!obj)
+        return
       const keys = Object.keys(obj)
       for (let i = 0; i < keys.length; i++) {
         if (keys[i].includes("Project")) {
+          const serie = series.find(s => s.dataFields.valueY == keys[i])
           const value = obj[keys[i]];
-          this.columnText += `${keys[i]}: ${value}\n`
+          str += `<tr>
+                    <th>
+                    <svg width="10" height="10">
+                    <rect width="300" height="100" style="fill:${serie.fill};stroke-width:3;stroke:rgb(0,0,0)" />
+                    </svg>
+                    </th> : 
+                    <th align="left" style ="color:black;font-size:12px;">${keys[i]}</th>
+                    <td style ="color:black;font-size:12px;">${value}</td>
+                  </tr>`
         }
       }
-      this.columnText += `total: ${obj.total}`
+
+      str += `</table>
+      <hr />
+      </div>`
+      for (let i = 0; i < this.chart.xAxes.values[0].element.node.children.length; i++) {
+        const element = this.chart.xAxes.values[0].element.node.children[i];
+        element.setAttribute("fill", "#FFFFFF")
+      }
+      this.chart.xAxes.values[0].tooltipHTML = str;
     })
   }
   private setXAxis(chart: any, dataDisplay: any) {
@@ -77,8 +102,24 @@ export class StackVertChartComponent implements OnInit {
     categoryAxis.dataFields.category = dataDisplay.display.yAxis;
     categoryAxis.renderer.grid.template.location = 0;
     categoryAxis.renderer.minGridDistance = 20;
-    categoryAxis.tooltipText = this.columnText;
-    categoryAxis.tooltipHTML = this.columnText;
+    // categoryAxis.tooltipText = this.columnText;
+    categoryAxis.tooltipHTML = `<center><strong>YEAR </strong></center>
+    <hr />
+    <table>
+    <tr>
+      <th align="left">Cars</th>
+      <td>{cars}</td>
+    </tr>
+    <tr>
+      <th align="left">Motorcycles</th>
+      <td>{motorcycles}</td>
+    </tr>
+    <tr>
+      <th align="left">Bicycles</th>
+      <td>{bicycles}</td>
+    </tr>
+    </table>
+    <hr />`;
     return categoryAxis;
   }
 }
@@ -151,16 +192,18 @@ function setYAxis(chart: any) {
   valueAxis.min = 0;
   valueAxis.cursorTooltipEnabled = false;
 }
-function setXAxisTooltip(categoryAxis, chart: any) {
+function setXAxisTooltip(categoryAxis: CategoryAxis, chart: any) {
   let axisTooltip = categoryAxis.tooltip;
-  axisTooltip.background.fill = color("black");
-  axisTooltip.stroke = color("red");
+  axisTooltip.background.fill = color("#FFFFFF");
   axisTooltip.background.strokeWidth = 0;
   axisTooltip.background.cornerRadius = 3;
   axisTooltip.background.pointerLength = 0;
   axisTooltip.dy = -300;
-  axisTooltip.dx = 70;
   axisTooltip.className = "axis-tooltip";
+  axisTooltip.parent.element.node.setAttribute("fill", "#FFFFFF")
+
+  // axisTooltip.parent.background.fill = color("white")
+
 
   chart.cursor = new XYCursor();
   (<XYCursor>chart.cursor).lineX.disabled = true;
