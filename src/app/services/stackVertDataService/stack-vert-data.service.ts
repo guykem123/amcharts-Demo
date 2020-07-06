@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { DataService } from '../dataService/data.service';
+export interface DataForStackVertBar {
+  name: string,
+  data: any[],
+  display: { yAxis: string, xAxis: string[] }
+}
 
 @Injectable({
   providedIn: 'root'
@@ -10,14 +15,14 @@ export class StackVertDataService {
     this.selectedData.next(dataDispaly)
   }
 
-  projects: { name: string, data: any[], display: { yAxis: string, xAxis: string[] } }
-  services: { name: string, data: any[], display: { yAxis: string, xAxis: string[] } }
-  locations: { name: string, data: any[], display: { yAxis: string, xAxis: string[] } }
-  selectedData: BehaviorSubject<{ name: string, data: any[] }>
+  projects: DataForStackVertBar
+  services: DataForStackVertBar
+  locations: DataForStackVertBar
+  selectedData: BehaviorSubject<DataForStackVertBar>
   constructor(private dataService: DataService) {
     this.projects = {
       name: "Projects",
-      data: dataService.projectsData.map(obj => {
+      data: this.dataService.projectsData.map(obj => {
         const values = Object.values(obj)
         let total = 0
         values.forEach(element => {
@@ -34,7 +39,7 @@ export class StackVertDataService {
     }
     this.services = {
       name: "Services",
-      data: dataService.servicesData,
+      data: this.dataService.servicesData,
       display: {
         yAxis: Object.keys(dataService.servicesData[0]).find(x => !x.includes("Service")),
         xAxis: Object.keys(dataService.servicesData[0]).filter(x => x.includes("Service")),
@@ -42,13 +47,13 @@ export class StackVertDataService {
     }
     this.locations = {
       name: "Locations",
-      data: dataService.locationData,
+      data: this.dataService.locationData,
       display: {
         yAxis: "Month",
         xAxis: Object.keys(dataService.locationData[0]).filter(x => !x.includes("Month")),
       }
     }
-    this.selectedData = new BehaviorSubject<{ name: string, data: any[] }>(this.projects)
+    this.selectedData = new BehaviorSubject<DataForStackVertBar>(this.projects)
   }
 
   getAllDataOptions() {

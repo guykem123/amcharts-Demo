@@ -45,52 +45,16 @@ export class FirstGraphComponent implements OnInit {
   ngOnInit(): void {
     this.chart = create("groupBarChart", XYChart);
     this.chart.data = this.data
-    // setLegend(this.chart);
-    setYAxes(this.chart);
-
     this.chart.clickable = true;
+    
+    setYAxes(this.chart);
+    setXAxes(this.chart);
 
-    let valueAxis = this.chart.xAxes.push(new ValueAxis());
-
-    valueAxis.renderer.opposite = true;
-    valueAxis.renderer.grid.template.strokeOpacity = 0;
-    valueAxis.min = 0
-    // valueAxis.renderer.grid.template.disabled = true;
-    // valueAxis.renderer.labels.template.disabled = true;
-
-
-    function createSeries(field, name, chart) {
-      let series: ColumnSeries = chart.series.push(new ColumnSeries());
-      series.clickable = true;
-      series.dataFields.valueX = field;
-      (<any>series).dataFields.total = "total";
-      series.hiddenState.transitionDuration = 400;
-      series.dataFields.categoryY = "year";
-      series.name = name;
-      series.sequencedInterpolation = true;
-      series.events.on("hit", (e) => {
-        // console.log(e.target.visible)
-        // e.target.visible = !e.target.visible;
-        if (e.target.visible)
-          e.target.hide()
-        else
-          e.target.appear()
-      })
-      series.userClassName = "serie"
-
-      let valueLabel = series.bullets.push(new LabelBullet());
-      valueLabel.userClassName = "abc"
-      valueLabel.label.text = "{total}";
-      valueLabel.label.horizontalCenter = "left";
-      valueLabel.label.dx = 10;
-      valueLabel.label.hideOversized = false;
-      valueLabel.label.truncate = false;
-
-      // console.log(series.realFill._value)
-    }
-
+    //set series
     createSeries("income", "Income", this.chart);
     createSeries("expenses", "Xxpenses", this.chart);
+
+    // addLegend(this.chart);
 
   }
 
@@ -111,6 +75,50 @@ export class FirstGraphComponent implements OnInit {
     this.expensesState = !this.expensesState
   }
 }
+
+function createSeries(field, name, chart) {
+  let series: ColumnSeries = createSerieWithMetadata(chart, field, name);
+  setSerieOnClickEv(series);
+  setLabelForEachSerie(series);
+}
+
+function setXAxes(chart) {
+  let valueAxis = chart.xAxes.push(new ValueAxis());
+
+  valueAxis.renderer.opposite = true;
+  valueAxis.renderer.grid.template.strokeOpacity = 0;
+  valueAxis.min = 0;
+  // valueAxis.renderer.grid.template.disabled = true;
+  // valueAxis.renderer.labels.template.disabled = true;
+}
+function createSerieWithMetadata(chart: any, field: any, name: any) {
+  let series: ColumnSeries = chart.series.push(new ColumnSeries());
+  series.clickable = true;
+  series.dataFields.valueX = field;
+  series.hiddenState.transitionDuration = 400;
+  series.dataFields.categoryY = "year";
+  series.name = name;
+  series.sequencedInterpolation = true;
+  series.userClassName = "serie";
+  return series;
+}
+function setSerieOnClickEv(series: ColumnSeries) {
+  series.events.on("hit", (e) => {
+    if (e.target.visible)
+      e.target.hide();
+    else
+      e.target.appear();
+  });
+}
+function setLabelForEachSerie(series: ColumnSeries) {
+  let valueLabel = series.bullets.push(new LabelBullet());
+  valueLabel.userClassName = "abc";
+  valueLabel.label.text = "{total}";
+  valueLabel.label.horizontalCenter = "left";
+  valueLabel.label.dx = 10;
+  valueLabel.label.hideOversized = false;
+  valueLabel.label.truncate = false;
+}
 function setYAxes(chart: XYChart) {
   let categoryAxis = chart.yAxes.push(new CategoryAxis());
   categoryAxis.dataFields.category = "year";
@@ -120,8 +128,7 @@ function setYAxes(chart: XYChart) {
   // categoryAxis.renderer.grid.template.disabled = true;
   // categoryAxis.renderer.labels.template.disabled = true;
 }
-
-function setLegend(chart: XYChart) {
+function addLegend(chart: XYChart) {
   chart.legend = new Legend();
   chart.legend.position = "top";
   chart.legend.maxHeight = 40;
@@ -132,7 +139,6 @@ function setLegend(chart: XYChart) {
   marker.strokeWidth = 2;
   marker.strokeOpacity = 1;
   marker.stroke = color("#ccc");
-
 
 }
 

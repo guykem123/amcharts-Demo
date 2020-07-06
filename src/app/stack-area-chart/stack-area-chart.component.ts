@@ -113,73 +113,99 @@ export class StackAreaChartComponent implements OnInit {
   ngOnInit(): void {
     let chart = create("stackAreaChart", XYChart);
     chart.data = this.data
-
     chart.dateFormatter.inputDateFormat = "yyyy";
-    let dateAxis = chart.xAxes.push(new DateAxis());
-    dateAxis.renderer.minGridDistance = 60;
-    dateAxis.startLocation = 0.5;
-    dateAxis.endLocation = 0.5;
-    dateAxis.baseInterval = {
-      timeUnit: "year",
-      count: 1
-    }
 
-    let valueAxis = chart.yAxes.push(new ValueAxis());
-    valueAxis.tooltip.disabled = true;
+    //set axis
+    setXAxis(chart);
+    setYAxis(chart);
 
-    let series = chart.series.push(new LineSeries());
-    series.dataFields.dateX = "year";
-    series.name = "cars";
-    series.dataFields.valueY = "cars";
-    series.tooltip.background.fill = color("#FFF");
-    series.tooltip.getStrokeFromObject = true;
-    series.tooltip.background.strokeWidth = 3;
-    series.tooltip.getFillFromObject = false;
-    series.fillOpacity = 0.6;
-    series.strokeWidth = 2;
-    series.stacked = true;
+    //set series
+    setCarSerie(chart);
+    setMotorcycleSerie(chart);
+    setBicycleSerie(chart);
 
-    let series2 = chart.series.push(new LineSeries());
-    series2.name = "motorcycles";
-    series2.dataFields.dateX = "year";
-    series2.dataFields.valueY = "motorcycles";
-    series2.tooltipHTML = "<img src='https://www.amcharts.com/lib/3/images/motorcycle.png' style='vertical-align:bottom; margin-right: 10px; width:28px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
-    series2.tooltipText = "[#000]{valueY.value}[/]";
-    series2.tooltip.background.fill = color("#FFF");
-    series2.tooltip.getFillFromObject = false;
-    series2.tooltip.getStrokeFromObject = true;
-    series2.tooltip.background.strokeWidth = 3;
-    series2.sequencedInterpolation = true;
-    series2.fillOpacity = 0.6;
-    series2.stacked = true;
-    series2.strokeWidth = 2;
-
-    let series3 = chart.series.push(new LineSeries());
-    series3.name = "bicycles";
-    series3.dataFields.dateX = "year";
-    series3.dataFields.valueY = "bicycles";
-    series3.tooltipHTML = "<img src='https://www.amcharts.com/lib/3/images/bicycle.png' style='vertical-align:bottom; margin-right: 10px; width:28px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
-    series3.tooltipText = "[#000]{valueY.value}[/]";
-    series3.tooltip.background.fill = color("#FFF");
-    series3.tooltip.getFillFromObject = false;
-    series3.tooltip.getStrokeFromObject = true;
-    series3.tooltip.background.strokeWidth = 3;
-    series3.sequencedInterpolation = true;
-    series3.fillOpacity = 0.6;
-    series3.defaultState.transitionDuration = 1000;
-    series3.stacked = true;
-    series3.strokeWidth = 2;
-
-    chart.cursor = new XYCursor();
-    chart.cursor.xAxis = dateAxis;
-    chart.scrollbarX = new Scrollbar();
-
-    // Add a legend
-    chart.legend = new Legend();
-    chart.legend.position = "top";
-
-    
+    addCursor(chart);
+    addLegend(chart);
 
   }
 
 }
+
+
+function addCursor(chart: XYChart) {
+  chart.cursor = new XYCursor();
+  chart.scrollbarX = new Scrollbar();
+}
+
+function addLegend(chart: XYChart) {
+  chart.legend = new Legend();
+  chart.legend.position = "top";
+}
+
+function setBicycleSerie(chart: XYChart) {
+  let series3 = chart.series.push(new LineSeries());
+  series3.name = "bicycles";
+  series3.dataFields.dateX = "year";
+  series3.dataFields.valueY = "bicycles";
+  series3.tooltipHTML = "<img src='https://www.amcharts.com/lib/3/images/bicycle.png' style='vertical-align:bottom; margin-right: 10px; width:28px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
+  series3.tooltipText = "[#000]{valueY.value}[/]";
+  series3.tooltip.background.fill = color("#FFF");
+  series3.tooltip.getFillFromObject = false;
+  series3.tooltip.getStrokeFromObject = true;
+  series3.tooltip.background.strokeWidth = 3;
+  series3.sequencedInterpolation = true;
+  series3.fillOpacity = 0.6;
+  series3.defaultState.transitionDuration = 1000;
+  series3.stacked = true;
+  series3.strokeWidth = 2;
+}
+
+function setMotorcycleSerie(chart: XYChart) {
+  let series2 = chart.series.push(new LineSeries());
+  series2.name = "motorcycles";
+  series2.dataFields.dateX = "year";
+  series2.dataFields.valueY = "motorcycles";
+  series2.tooltipHTML = "<img src='https://www.amcharts.com/lib/3/images/motorcycle.png' style='vertical-align:bottom; margin-right: 10px; width:28px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
+  series2.tooltipText = "[#000]{valueY.value}[/]";
+  series2.tooltip.background.fill = color("#FFF");
+  series2.tooltip.getFillFromObject = false;
+  series2.tooltip.getStrokeFromObject = true;
+  series2.tooltip.background.strokeWidth = 3;
+  series2.sequencedInterpolation = true;
+  series2.fillOpacity = 0.6;
+  series2.stacked = true;
+  series2.strokeWidth = 2;
+}
+
+function setCarSerie(chart: XYChart) {
+  let series = chart.series.push(new LineSeries());
+  series.dataFields.dateX = "year";
+  series.name = "cars";
+  series.dataFields.valueY = "cars";
+  series.tooltipHTML = "<img src='https://www.amcharts.com/lib/3/images/car.png' style='vertical-align:bottom; margin-right: 10px; width:28px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
+  series.tooltipText = "[#000]{valueY.value}[/]";
+  series.tooltip.background.fill = color("#FFF");
+  series.tooltip.getStrokeFromObject = true;
+  series.tooltip.background.strokeWidth = 3;
+  series.tooltip.getFillFromObject = false;
+  series.fillOpacity = 0.6;
+  series.strokeWidth = 2;
+  series.stacked = true;
+}
+
+function setXAxis(chart: XYChart) {
+  let dateAxis = chart.xAxes.push(new DateAxis());
+  dateAxis.renderer.minGridDistance = 60;
+  dateAxis.startLocation = 0.5;
+  dateAxis.endLocation = 0.5;
+  dateAxis.baseInterval = {
+    timeUnit: "year",
+    count: 1
+  };
+}
+
+function setYAxis(chart: XYChart) {
+  let valueAxis = chart.yAxes.push(new ValueAxis());
+  valueAxis.tooltip.disabled = true;
+}
+
