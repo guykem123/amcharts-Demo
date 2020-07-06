@@ -15,12 +15,10 @@ import { clone } from '@amcharts/amcharts4/.internal/core/utils/Object';
 export class StackVertChartComponent implements OnInit {
   //observable that return the current selected data
   dataSubject$: BehaviorSubject<DataForStackVertBar>
-
+  seriesState: { serie: ColumnSeries, stateHidden: boolean }[]
   chart: XYChart
-  columnText: string
   constructor(private stackVertData: StackVertDataService) {
     this.dataSubject$ = this.stackVertData.selectedData
-    this.columnText = ""
   }
 
   ngOnInit(): void {
@@ -57,25 +55,28 @@ export class StackVertChartComponent implements OnInit {
   }
   private setSerieOnColumnOverEv(serie: ColumnSeries, dataDisplay) {
     serie.columns.template.events.on("over", (e) => {
-      const year = (<any>e.target.dataItem).categoryX
+      const valueYAxis = (<any>e.target.dataItem).categoryX;
+      const keyYAxis = (<any>e.target.parent.dataItem.component.dataFields).categoryX;
       const series = this.chart.series.values
-      let str = ``
+
+      let str
 
       str = `
       <div style ="background-color:white">
-      <center><strong style ="color:black;">YEAR ${year}</strong></center>
+      <center><strong style ="color:black;">${keyYAxis.toUpperCase()} ${valueYAxis}</strong></center>
         <hr />
           <table>`
 
-      const obj = dataDisplay.data.find(x => x["year"] == year)
+      const obj = dataDisplay.data.find(x => x[keyYAxis] == valueYAxis)
       if (!obj)
         return
       const keys = Object.keys(obj)
       for (let i = 0; i < keys.length; i++) {
-        if (keys[i].includes("Project")) {
+        if (this.dataSubject$.value.display.xAxis.find(x => x == keys[i])) {
           const serie = series.find(s => s.dataFields.valueY == keys[i])
-          const value = obj[keys[i]];
-          str += `<tr>
+          if (!serie.isHidden) {
+            const value = obj[keys[i]];
+            str += `<tr>
                     <th>
                     <svg width="10" height="10">
                     <rect width="300" height="100" style="fill:${serie.fill};stroke-width:3;stroke:rgb(0,0,0)" />
@@ -84,16 +85,17 @@ export class StackVertChartComponent implements OnInit {
                     <th align="left" style ="color:black;font-size:12px;">${keys[i]}</th>
                     <td style ="color:black;font-size:12px;">${value}</td>
                   </tr>`
+          }
         }
       }
 
       str += `</table>
       <hr />
       </div>`
-      for (let i = 0; i < this.chart.xAxes.values[0].element.node.children.length; i++) {
-        const element = this.chart.xAxes.values[0].element.node.children[i];
-        element.setAttribute("fill", "#FFFFFF")
-      }
+
+      if (str)
+        console.log(1)
+      this.chart.xAxes.values[0].tooltip.element.node.parentElement.children[0].setAttribute("fill", "white")
       this.chart.xAxes.values[0].tooltipHTML = str;
     })
   }
@@ -102,24 +104,7 @@ export class StackVertChartComponent implements OnInit {
     categoryAxis.dataFields.category = dataDisplay.display.yAxis;
     categoryAxis.renderer.grid.template.location = 0;
     categoryAxis.renderer.minGridDistance = 20;
-    // categoryAxis.tooltipText = this.columnText;
-    categoryAxis.tooltipHTML = `<center><strong>YEAR </strong></center>
-    <hr />
-    <table>
-    <tr>
-      <th align="left">Cars</th>
-      <td>{cars}</td>
-    </tr>
-    <tr>
-      <th align="left">Motorcycles</th>
-      <td>{motorcycles}</td>
-    </tr>
-    <tr>
-      <th align="left">Bicycles</th>
-      <td>{bicycles}</td>
-    </tr>
-    </table>
-    <hr />`;
+
     return categoryAxis;
   }
 }
@@ -165,6 +150,7 @@ function onSerieShownEv(series: ColumnSeries, chart: XYChart) {
 }
 function onSerieHideEv(series: ColumnSeries, chart: XYChart) {
   series.events.on("hidden", (e) => {
+    console.log("hidden");
     const prop = (<ColumnSeries>e.target).dataFields.valueY;
     chart.data.forEach(element => {
       element["total"] -= element[prop];
@@ -194,17 +180,11 @@ function setYAxis(chart: any) {
 }
 function setXAxisTooltip(categoryAxis: CategoryAxis, chart: any) {
   let axisTooltip = categoryAxis.tooltip;
-  axisTooltip.background.fill = color("#FFFFFF");
   axisTooltip.background.strokeWidth = 0;
   axisTooltip.background.cornerRadius = 3;
   axisTooltip.background.pointerLength = 0;
   axisTooltip.dy = -300;
-  axisTooltip.className = "axis-tooltip";
-  axisTooltip.parent.element.node.setAttribute("fill", "#FFFFFF")
-
-  // axisTooltip.parent.background.fill = color("white")
-
-
+  
   chart.cursor = new XYCursor();
   (<XYCursor>chart.cursor).lineX.disabled = true;
   (<XYCursor>chart.cursor).lineY.disabled = true;

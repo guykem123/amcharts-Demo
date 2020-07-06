@@ -39,7 +39,16 @@ export class StackVertDataService {
     }
     this.services = {
       name: "Services",
-      data: this.dataService.servicesData,
+      data: this.dataService.servicesData.map(obj => {
+        const values = Object.values(obj)
+        let total = 0
+        values.forEach(element => {
+          if (element && typeof (element) == "number") {
+            total += element
+          }
+        });
+        return { ...obj, total }
+      }),
       display: {
         yAxis: Object.keys(dataService.servicesData[0]).find(x => !x.includes("Service")),
         xAxis: Object.keys(dataService.servicesData[0]).filter(x => x.includes("Service")),
@@ -47,7 +56,16 @@ export class StackVertDataService {
     }
     this.locations = {
       name: "Locations",
-      data: this.dataService.locationData,
+      data: this.dataService.locationData.map(obj => {
+        const values = Object.values(obj)
+        let total = 0
+        values.forEach(element => {
+          if (element && typeof (element) == "number") {
+            total += element
+          }
+        });
+        return { ...obj, total }
+      }),
       display: {
         yAxis: "Month",
         xAxis: Object.keys(dataService.locationData[0]).filter(x => !x.includes("Month")),
