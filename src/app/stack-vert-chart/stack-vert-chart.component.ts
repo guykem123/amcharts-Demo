@@ -93,10 +93,8 @@ export class StackVertChartComponent implements OnInit {
       <hr />
       </div>`
 
-      if (str)
-        console.log(1)
       this.chart.xAxes.values[0].tooltip.element.node.parentElement.children[0].setAttribute("fill", "white")
-      this.chart.xAxes.values[0].tooltipHTML = str;
+      this.chart.xAxes.values[0].tooltip.html = str;
     })
   }
   private setXAxis(chart: any, dataDisplay: any) {
@@ -184,7 +182,7 @@ function setXAxisTooltip(categoryAxis: CategoryAxis, chart: any) {
   axisTooltip.background.cornerRadius = 3;
   axisTooltip.background.pointerLength = 0;
   axisTooltip.dy = -300;
-  
+
   chart.cursor = new XYCursor();
   (<XYCursor>chart.cursor).lineX.disabled = true;
   (<XYCursor>chart.cursor).lineY.disabled = true;
