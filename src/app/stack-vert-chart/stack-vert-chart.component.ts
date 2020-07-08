@@ -62,7 +62,7 @@ export class StackVertChartComponent implements OnInit {
       let str
 
       str = `
-      <div style ="background-color:white">
+      <div class="scroll-container" style ="background-color:white;max-height:150px;overflow:auto">
       <center><strong style ="color:black;">${keyYAxis.toUpperCase()} ${valueYAxis}</strong></center>
         <hr />
           <table>`
@@ -95,7 +95,16 @@ export class StackVertChartComponent implements OnInit {
 
       this.chart.xAxes.values[0].tooltip.element.node.parentElement.children[0].setAttribute("fill", "white")
       this.chart.xAxes.values[0].tooltip.html = str;
+      this.moveScrollTooltip("scroll-container", this.chart.xAxes.values[0].tooltip)
     })
+  }
+
+  private moveScrollTooltip(className: string, tooltip: any) {
+    const tooltipEl = document.querySelector(`.${className}`)
+    if (tooltipEl) {
+      console.log(tooltipEl.parentNode.parentNode.parentElement)
+      tooltipEl.parentNode.parentNode.parentNode.parentElement.removeAttribute("style");
+    }
   }
   private setXAxis(chart: any, dataDisplay: any) {
     let categoryAxis: CategoryAxis = chart.xAxes.push(new CategoryAxis());

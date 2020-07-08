@@ -17,13 +17,11 @@ export class FirstGraphComponent implements OnInit {
   data: any[] = [{
     "year": 2005,
     "income": 23.5,
-    "expenses": 18.1,
-    "total": 100
+    "expenses": 18.1
   }, {
     "year": 2006,
     "income": 26.2,
-    "expenses": 22.8,
-    "total": 110
+    "expenses": 22.8
   }, {
     "year": 2007,
     "income": 30.1,
@@ -113,7 +111,6 @@ function setSerieOnClickEv(series: ColumnSeries) {
 function setLabelForEachSerie(series: ColumnSeries) {
   let valueLabel = series.bullets.push(new LabelBullet());
   valueLabel.userClassName = "abc";
-  valueLabel.label.text = "{total}";
   valueLabel.label.horizontalCenter = "left";
   valueLabel.label.dx = 10;
   valueLabel.label.hideOversized = false;
