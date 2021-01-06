@@ -1,18 +1,3 @@
 <div class="graph">
   <app-first-graph></app-first-graph>
 </div>
-
-<div class="graph">
-  <select [(ngModel)]="dataDispaly.name" (change)="changeSelect()">
-    <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
-      {{ opt.name }}
-    </option>
-  </select>
-  <app-stack-vert-chart></app-stack-vert-chart>
-</div>
-<div class="graph">
-  <app-stack-area-chart></app-stack-area-chart>
-</div>
-<div class="graph">
-  <app-first-graph></app-first-graph>
-</div>
