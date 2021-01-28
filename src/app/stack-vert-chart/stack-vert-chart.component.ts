@@ -185,6 +185,7 @@ function setYAxis(chart: any) {
   let valueAxis = chart.yAxes.push(new ValueAxis());
   valueAxis.cursorTooltipEnabled = false;
   valueAxis.calculateTotals = true;
+  valueAxis.maxZoomFactor = 10000000;
 }
 
 function setXAxisTooltip(categoryAxis: CategoryAxis, chart: any) {
