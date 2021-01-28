@@ -1,47 +1,56 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 
-import { useTheme, create, percent, color, DropShadowFilter, Label } from "@amcharts/amcharts4/core";
+import { useTheme, create, percent, color, DropShadowFilter, Label, NumberFormatter } from "@amcharts/amcharts4/core";
 import { XYChart, ColumnSeries, ValueAxis, CategoryAxis, Legend, XYCursor, LabelBullet, } from "@amcharts/amcharts4/charts";
 import { StackVertDataService, DataForStackVertBar } from '../services/stackVertDataService/stack-vert-data.service';
 import { BehaviorSubject } from 'rxjs';
 import { clone } from '@amcharts/amcharts4/.internal/core/utils/Object';
 // import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+let isProject = true;
+
 
 @Component({
   selector: 'app-stack-vert-chart',
   templateUrl: './stack-vert-chart.component.html',
   styleUrls: ['./stack-vert-chart.component.css']
 })
-export class StackVertChartComponent implements OnInit {
+export class StackVertChartComponent implements OnInit, AfterViewInit {
   //observable that return the current selected data
-  dataSubject$: BehaviorSubject<DataForStackVertBar>
-  seriesState: { serie: ColumnSeries, stateHidden: boolean }[]
-  chart: XYChart
+  dataSubject$: BehaviorSubject<DataForStackVertBar>;
+  seriesState: { serie: ColumnSeries, stateHidden: boolean; }[];
+  chart: XYChart;
+  chartId: string;
   constructor(private stackVertData: StackVertDataService) {
-    this.dataSubject$ = this.stackVertData.selectedData
+    this.chartId = getRandomWord();
+    this.dataSubject$ = isProject ? this.stackVertData.selectedData : this.stackVertData.selectedDataService;
+    isProject = !isProject;
+  }
+
+  ngAfterViewInit(): void {
+    //change chart data on BehaviorSubject event change
+    this.dataSubject$.subscribe(x => this.setChart(this.chart, x));
   }
 
   ngOnInit(): void {
-    this.chart = create("stackVertChart", XYChart);
-    //change chart data on BehaviorSubject event change
-    this.dataSubject$.subscribe(x => this.setChart(this.chart, x))
+
   }
 
-  setChart(chart, dataDisplay) {
-    if (!chart)
-      return
-    chart.data = dataDisplay.data
+  setChart(chart:XYChart, dataDisplay) {
+    if (chart)
+      this.chart.dispose();
+    this.chart = create(this.chartId, XYChart);
+    chart = this.chart;
+    chart.data = dataDisplay.data;
+    chart.numberFormatter.numberFormat = "#.a"
 
-    //set axis
-    removeOldAxisData(chart);
     let categoryAxis: CategoryAxis = this.setXAxis(chart, dataDisplay);
     //change tooltipText data
-    setXAxisTooltip(categoryAxis, chart);
+    // setXAxisTooltip(categoryAxis, chart);
     setYAxis(chart);
-
-    removeOldSeries(chart);
     this.setSeries(dataDisplay);
+    setTotalLabelForStack(dataDisplay, this.chart);
     addLegend(chart);
+    
 
   }
 
@@ -50,59 +59,13 @@ export class StackVertChartComponent implements OnInit {
       const element = dataDisplay.display.xAxis[i];
       const isLastSerie = i == dataDisplay.display.xAxis.length - 1;
       const serie = createSerie(element, element, true, dataDisplay, isLastSerie, this.chart);
-      this.setSerieOnColumnOverEv(serie, dataDisplay);
     }
   }
-  private setSerieOnColumnOverEv(serie: ColumnSeries, dataDisplay) {
-    serie.columns.template.events.on("over", (e) => {
-      const valueYAxis = (<any>e.target.dataItem).categoryX;
-      const keyYAxis = (<any>e.target.parent.dataItem.component.dataFields).categoryX;
-      const series = this.chart.series.values
 
-      let str
-
-      str = `
-      <div class="scroll-container" style ="background-color:white;max-height:150px;overflow:auto">
-      <center><strong style ="color:black;">${keyYAxis.toUpperCase()} ${valueYAxis}</strong></center>
-        <hr />
-          <table>`
-
-      const obj = dataDisplay.data.find(x => x[keyYAxis] == valueYAxis)
-      if (!obj)
-        return
-      const keys = Object.keys(obj)
-      for (let i = 0; i < keys.length; i++) {
-        if (this.dataSubject$.value.display.xAxis.find(x => x == keys[i])) {
-          const serie = series.find(s => s.dataFields.valueY == keys[i])
-          if (!serie.isHidden) {
-            const value = obj[keys[i]];
-            str += `<tr>
-                    <th>
-                    <svg width="10" height="10">
-                    <rect width="300" height="100" style="fill:${serie.fill};stroke-width:3;stroke:rgb(0,0,0)" />
-                    </svg>
-                    </th> : 
-                    <th align="left" style ="color:black;font-size:12px;">${keys[i]}</th>
-                    <td style ="color:black;font-size:12px;">${value}</td>
-                  </tr>`
-          }
-        }
-      }
-
-      str += `</table>
-      <hr />
-      </div>`
-
-      this.chart.xAxes.values[0].tooltip.element.node.parentElement.children[0].setAttribute("fill", "white")
-      this.chart.xAxes.values[0].tooltip.html = str;
-      this.moveScrollTooltip("scroll-container", this.chart.xAxes.values[0].tooltip)
-    })
-  }
 
   private moveScrollTooltip(className: string, tooltip: any) {
-    const tooltipEl = document.querySelector(`.${className}`)
+    const tooltipEl = document.querySelector(`.${className}`);
     if (tooltipEl) {
-      console.log(tooltipEl.parentNode.parentNode.parentElement)
       tooltipEl.parentNode.parentNode.parentNode.parentElement.removeAttribute("style");
     }
   }
@@ -111,53 +74,91 @@ export class StackVertChartComponent implements OnInit {
     categoryAxis.dataFields.category = dataDisplay.display.yAxis;
     categoryAxis.renderer.grid.template.location = 0;
     categoryAxis.renderer.minGridDistance = 20;
-
+    categoryAxis.renderer.cellStartLocation = 0.2;
+    categoryAxis.renderer.cellEndLocation = 0.8;
+    const labelTemplate = categoryAxis.renderer.labels.template;
+    labelTemplate.rotation = -70;
+    labelTemplate.horizontalCenter = "right";
+    labelTemplate.verticalCenter = "middle";
+    labelTemplate.maxWidth = 100;
     return categoryAxis;
   }
 }
 
 //serie functions
 function createSerie(field: string, name: string, stacked: boolean, dataDisplay, isLastSerie: boolean, chart: XYChart) {
-  let series: ColumnSeries = creatSerieMetadta(chart, field, dataDisplay, name, stacked);
-
+  let series: ColumnSeries = creatSerieMetadata(chart, field, dataDisplay, name, stacked);
+  //   series.columns.template.tooltipHTML = `
+  //   <div style="display: flex; align-items: center; justify-content: center;flex-direction:column">
+  //     <div>Header</div>
+  //     <div style="display: flex; justify-content: space-between; width: 100%;">
+  //         <div>Data</div>
+  //         <div>Something</div>
+  //     </div>
+  // </div>
+  //   `;
   //on hide or show events we change the column total price of all projects
   onSerieHideEv(series, chart);
   onSerieShownEv(series, chart);
-  //we add label to serie if it is the last one
   addLabelToSerie(series, isLastSerie);
 
-  return series
+  return series;
 }
+
 function addLabelToSerie(series, isLastSerie) {
   if (isLastSerie) {
     let valueLabel = series.bullets.push(new LabelBullet());
-    valueLabel.label.text = "{total}";
+    valueLabel.label.text = "{valueY.total}";
     valueLabel.label.dy = -10;
     valueLabel.label.hideOversized = false;
     valueLabel.label.truncate = false;
   }
 }
-function creatSerieMetadta(chart: XYChart, field: string, dataDisplay: any, name: string, stacked: boolean) {
+
+function setTotalLabelForStack(dataDisplay, chart) {
+  const totalSeries = chart.series.push(new ColumnSeries());
+  chart.data.forEach(chartCategoryV => chartCategoryV.totalSeriesValues = 0);//this is for aggregate the sum of all series on one category
+  totalSeries.dataFields.valueY = 'totalSeriesValues';
+  totalSeries.dataFields.categoryX = dataDisplay.display.yAxis;
+  totalSeries.stacked = true;
+  totalSeries.hiddenInLegend = true;
+  totalSeries.columns.template.strokeOpacity = 0;
+  setLabelForEachSerie(totalSeries, true);
+}
+
+function setLabelForEachSerie(series, stacked) {
+  const valueLabel: LabelBullet = series.bullets.push(new LabelBullet());
+  valueLabel.label.text = '{valueY.sum}';
+  valueLabel.tooltipText = '{valueY.sum}';
+  valueLabel.label.truncate = false; // don't cut the full label
+  valueLabel.label.dy = -10;
+  valueLabel.label.textAlign = "middle";
+
+}
+
+function creatSerieMetadata(chart: XYChart, field: string, dataDisplay: any, name: string, stacked: boolean) {
   let series: ColumnSeries = chart.series.push(new ColumnSeries());
   series.dataFields.valueY = field;
   series.dataFields.categoryX = dataDisplay.display.yAxis;
   series.name = name;
   series.stacked = stacked;
   series.columns.template.width = percent(95);
+  series.hiddenState.transitionDuration = 600;
+  series.defaultState.transitionDuration = 600;
   return series;
 }
+
 function onSerieShownEv(series: ColumnSeries, chart: XYChart) {
   series.events.on("shown", (e) => {
-    console.log("appeared");
     const prop = (<ColumnSeries>e.target).dataFields.valueY;
     chart.data.forEach(element => {
       element["total"] += element[prop];
     });
   });
 }
+
 function onSerieHideEv(series: ColumnSeries, chart: XYChart) {
   series.events.on("hidden", (e) => {
-    console.log("hidden");
     const prop = (<ColumnSeries>e.target).dataFields.valueY;
     chart.data.forEach(element => {
       element["total"] -= element[prop];
@@ -182,9 +183,10 @@ function addLegend(chart: any) {
 //axis functions
 function setYAxis(chart: any) {
   let valueAxis = chart.yAxes.push(new ValueAxis());
-  valueAxis.min = 0;
   valueAxis.cursorTooltipEnabled = false;
+  valueAxis.calculateTotals = true;
 }
+
 function setXAxisTooltip(categoryAxis: CategoryAxis, chart: any) {
   let axisTooltip = categoryAxis.tooltip;
   axisTooltip.background.strokeWidth = 0;
@@ -202,6 +204,7 @@ function setXAxisTooltip(categoryAxis: CategoryAxis, chart: any) {
   dropShadow.opacity = 0.5;
   axisTooltip.filters.push(dropShadow);
 }
+
 function removeOldAxisData(chart: any) {
   if (chart.xAxes._values.length)
     chart.xAxes.removeIndex(0);
@@ -209,3 +212,12 @@ function removeOldAxisData(chart: any) {
     chart.yAxes.removeIndex(0);
 }
 
+function getRandomWord() {
+  let word = '';
+  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  for (let i = 0; i < 20; i++) {
+    const index = Math.floor(Math.random() * chars.length);
+    word += chars[index];
+  }
+  return word;
+}

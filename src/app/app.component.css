@@ -1,6 +1,37 @@
-.graph{
-    padding: 10px;
-    border: 1px solid black;
-    width: 700px;
-    height: 400px;
+.graph {
+  padding: 10px;
+  border: 1px solid black;
+  width: 45%;
+  flex-grow: 1;
+}
+
+.selection-options {
+  display: flex;
+  width: 100%;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.selection-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 30px;
+  font-size: 14px;
+}
+.selection-content span {
+  margin-right: 20px;
+}
+
+.selection-content select {
+  font-size: inherit;
+}
+
+.graphs-container {
+  width: 100%;
+  height: calc(100vh - 16px);
+  display: flex;
+  flex-wrap: wrap;
 }

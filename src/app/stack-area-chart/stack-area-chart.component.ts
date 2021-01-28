@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 
 import { useTheme, create, color, Scrollbar } from "@amcharts/amcharts4/core";
-import { XYChart, Legend, XYCursor, LineSeries, DateAxis, ValueAxis } from "@amcharts/amcharts4/charts";
+import { XYChart, Legend, XYCursor, LineSeries, DateAxis, ValueAxis, CategoryAxis } from "@amcharts/amcharts4/charts";
+import { StackVertDataService } from '../services/stackVertDataService/stack-vert-data.service';
+import { viewClassName } from '@angular/compiler';
 // import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
 @Component({
@@ -9,7 +11,7 @@ import { XYChart, Legend, XYCursor, LineSeries, DateAxis, ValueAxis } from "@amc
   templateUrl: './stack-area-chart.component.html',
   styleUrls: ['./stack-area-chart.component.css']
 })
-export class StackAreaChartComponent implements OnInit {
+export class StackAreaChartComponent implements OnInit, AfterViewInit {
 
   data: any[] = [{
     "year": "1994",
@@ -107,83 +109,52 @@ export class StackAreaChartComponent implements OnInit {
     "motorcycles": 277,
     "bicycles": 71
   }];
+  dataSubject$: any;
+  chart: XYChart;
+  chartId: string;
 
-  constructor() { }
+  constructor(private stackVertService: StackVertDataService) {
+    this.dataSubject$ = this.stackVertService.selectedDataArea;
+    this.chartId = getRandomWord();
+  }
+  ngAfterViewInit(): void {
+    this.dataSubject$.subscribe(x => this.setChart(x));
+  }
 
   ngOnInit(): void {
-    let chart = create("stackAreaChart", XYChart);
-    chart.data = this.data
-    chart.dateFormatter.inputDateFormat = "yyyy";
-
-    //set axis
-    setXAxis(chart);
-    setYAxis(chart);
-
-    //set series
-    setCarSerie(chart);
-    setMotorcycleSerie(chart);
-    setBicycleSerie(chart);
-
-    addCursor(chart);
-    addLegend(chart);
 
   }
 
+
+  private setChart(dataDisplay) {
+    if (this.chart)
+      this.chart.dispose();
+    this.chart = create(this.chartId, XYChart);
+    this.chart.data = dataDisplay.data;
+
+    //set axis
+    setXAxis(this.chart, dataDisplay);
+    setYAxis(this.chart);
+
+    //set series
+    this.setSeries(dataDisplay);
+
+    addLegend(this.chart);
+  }
+
+  private setSeries(dataDisplay: any) {
+    for (let i = 0; i < dataDisplay.display.xAxis.length; i++) {
+      const element = dataDisplay.display.xAxis[i];
+      const isLastSerie = i == dataDisplay.display.xAxis.length - 1;
+      const serie = createSerie(element, element, true, dataDisplay, isLastSerie, this.chart);
+    }
+  }
 }
-
-
-function addCursor(chart: XYChart) {
-  chart.cursor = new XYCursor();
-  chart.scrollbarX = new Scrollbar();
-}
-
-function addLegend(chart: XYChart) {
-  chart.legend = new Legend();
-  chart.legend.position = "top";
-}
-
-function setBicycleSerie(chart: XYChart) {
-  let series3 = chart.series.push(new LineSeries());
-  series3.name = "bicycles";
-  series3.dataFields.dateX = "year";
-  series3.dataFields.valueY = "bicycles";
-  series3.tooltipHTML = "<img src='https://www.amcharts.com/lib/3/images/bicycle.png' style='vertical-align:bottom; margin-right: 10px; width:28px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
-  series3.tooltipText = "[#000]{valueY.value}[/]";
-  series3.tooltip.background.fill = color("#FFF");
-  series3.tooltip.getFillFromObject = false;
-  series3.tooltip.getStrokeFromObject = true;
-  series3.tooltip.background.strokeWidth = 3;
-  series3.sequencedInterpolation = true;
-  series3.fillOpacity = 0.6;
-  series3.defaultState.transitionDuration = 1000;
-  series3.stacked = true;
-  series3.strokeWidth = 2;
-}
-
-function setMotorcycleSerie(chart: XYChart) {
-  let series2 = chart.series.push(new LineSeries());
-  series2.name = "motorcycles";
-  series2.dataFields.dateX = "year";
-  series2.dataFields.valueY = "motorcycles";
-  series2.tooltipHTML = "<img src='https://www.amcharts.com/lib/3/images/motorcycle.png' style='vertical-align:bottom; margin-right: 10px; width:28px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
-  series2.tooltipText = "[#000]{valueY.value}[/]";
-  series2.tooltip.background.fill = color("#FFF");
-  series2.tooltip.getFillFromObject = false;
-  series2.tooltip.getStrokeFromObject = true;
-  series2.tooltip.background.strokeWidth = 3;
-  series2.sequencedInterpolation = true;
-  series2.fillOpacity = 0.6;
-  series2.stacked = true;
-  series2.strokeWidth = 2;
-}
-
-function setCarSerie(chart: XYChart) {
-  let series = chart.series.push(new LineSeries());
-  series.dataFields.dateX = "year";
-  series.name = "cars";
-  series.dataFields.valueY = "cars";
-  series.tooltipHTML = "<img src='https://www.amcharts.com/lib/3/images/car.png' style='vertical-align:bottom; margin-right: 10px; width:28px; height:21px;'><span style='font-size:14px; color:#000000;'><b>{valueY.value}</b></span>";
-  series.tooltipText = "[#000]{valueY.value}[/]";
+function createSerie(name, key, isTrue, dataDisplay, isLastSerie, chart) {
+  let series: LineSeries = chart.series.push(new LineSeries());
+  series.name = name;
+  series.dataFields.valueY = key;
+  series.dataFields.categoryX = dataDisplay.display.yAxis;
   series.tooltip.background.fill = color("#FFF");
   series.tooltip.getStrokeFromObject = true;
   series.tooltip.background.strokeWidth = 3;
@@ -193,15 +164,16 @@ function setCarSerie(chart: XYChart) {
   series.stacked = true;
 }
 
-function setXAxis(chart: XYChart) {
-  let dateAxis = chart.xAxes.push(new DateAxis());
-  dateAxis.renderer.minGridDistance = 60;
-  dateAxis.startLocation = 0.5;
-  dateAxis.endLocation = 0.5;
-  dateAxis.baseInterval = {
-    timeUnit: "year",
-    count: 1
-  };
+function addLegend(chart: XYChart) {
+  chart.legend = new Legend();
+}
+
+function setXAxis(chart: XYChart, dataDisplay) {
+  let categoryAxis: CategoryAxis = chart.xAxes.push(new CategoryAxis());
+  categoryAxis.dataFields.category = dataDisplay.display.yAxis;
+  categoryAxis.renderer.minGridDistance = 60;
+  categoryAxis.startLocation = 0.5;
+  categoryAxis.endLocation = 0.5;
 }
 
 function setYAxis(chart: XYChart) {
@@ -209,3 +181,14 @@ function setYAxis(chart: XYChart) {
   valueAxis.tooltip.disabled = true;
 }
 
+
+
+function getRandomWord() {
+  let word = '';
+  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  for (let i = 0; i < 20; i++) {
+    const index = Math.floor(Math.random() * chars.length);
+    word += chars[index];
+  }
+  return word;
+}

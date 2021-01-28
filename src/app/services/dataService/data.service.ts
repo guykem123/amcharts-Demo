@@ -1,95 +1,104 @@
 import { Injectable } from '@angular/core';
 
+interface ProjectData {
+  "year": string,
+  [projectName: string]: number | string;
+}
+
+interface ServiceData {
+  "year": string,
+  [serviceName: string]: number | string;
+}
+
+
+interface LocationData {
+  "Month": string,
+  "USA": number,
+  "ISRAEL": number,
+  "GERMANY": number,
+  "RUSSIA": number,
+  "SPAIN": number,
+  "ITALY": number,
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
-  projectsData: any[] = [
-    {
-      "year": "1990",
-      "Project A": 19892,
-      "Project B": 19892,
-      "Project C": 44655,
-      "Project D": 13922,
-      "Project E": 44655,
-      "Project F": 32093,
-    },
-    {
-      "year": "2000",
-      "Project A": 55352,
-      "Project B": 55352,
-      "Project C": 41337,
-      "Project D": 32093,
-      "Project E": 41337,
-      "Project F": 32093,
-    },
-    {
-      "year": "2010",
-      "Project A": 59771,
-      "Project B": 59771,
-      "Project C": 17345,
-      "Project D": 52122,
-      "Project E": 17345,
-      "Project F": 52122,
-    }
-  ]
-  servicesData: any[] = [
-    {
-      "year": "1990",
-      "Service A": 1000,
-      "Service B": 2000,
-      "Service C": 3000,
-      "Service D": 2500,
-      "Service E": 3500,
-      "Service F": 4000,
-    },
-    {
-      "year": "2000",
-      "Service A": 2000,
-      "Service B": 2500,
-      "Service C": 3000,
-      "Service D": 2500,
-      "Service E": 4000,
-      "Service F": 2000,
-    },
-    {
-      "year": "2010",
-      "Service A": 1000,
-      "Service B": 2000,
-      "Service C": 3000,
-      "Service D": 4000,
-      "Service E": 2000,
-      "Service F": 3000,
-    }
-  ]
-  locationData: any[] = [
-    {
-      "Month": "April",
-      "USA": 1992,
-      "ISRAEL": 1989,
-      "GERMANY": 4655,
-      "RUSSIA": 1922,
-      "SPAIN": 7465,
-      "ITALY": 132,
-    },
-    {
-      "Month": "May",
-      "USA": 5532,
-      "ISRAEL": 5352,
-      "GERMANY": 4337,
-      "RUSSIA": 3203,
-      "SPAIN": 4137,
-      "ITALY": 3093,
-    },
-    {
-      "Month": "June",
-      "USA": 5977,
-      "ISRAEL": 5771,
-      "GERMANY": 1734,
-      "RUSSIA": 2192,
-      "SPAIN": 1735,
-      "ITALY": 2122,
-    }
-  ]
+  get projectsData() {
+    return this.generateProjectData();
+  }
+  get servicesData() {
+    return this.generateServiceData();
+  }
+  get locationData() {
+    return this.generateLocationData();
+  }
   constructor() { }
+
+  generateProjectData(): ProjectData[] {
+    const years = this.getYears();
+    const data: ProjectData[] = years.map(year => this.getProjectData(year));
+    return data;
+  };
+
+  generateServiceData(): ServiceData[] {
+    const years = this.getYears();
+    const data: ServiceData[] = years.map(year => this.getServiceData(year));
+    return data;
+  };
+
+  generateLocationData(): LocationData[] {
+    const months = this.getMonths();
+    const data: LocationData[] = months.map(m => this.getLocationData(m));
+    return data;
+  };
+  private getProjectData(year: string): ProjectData {
+    return ({
+      year,
+      "Project Small Data": (Math.floor(Math.random() * 3)),
+      "Project Large Data": this.getRandomNumber(),
+    });
+  }
+
+  private getLocationData(month: string): LocationData {
+    return ({
+      "Month": month,
+      "USA": this.getRandomNumber(),
+      "ISRAEL": this.getRandomNumber(),
+      "GERMANY": this.getRandomNumber(),
+      "RUSSIA": this.getRandomNumber(),
+      "SPAIN": this.getRandomNumber(),
+      "ITALY": this.getRandomNumber(),
+    });
+  }
+
+  private getServiceData(year: string): ServiceData {
+    return ({
+      year,
+      "Project Small Data": (Math.floor(Math.random() * 10)),
+      "Project Also Small Data": (Math.floor(Math.random() * 10)),
+    });
+  }
+
+  private getMonths() {
+    const mS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+    return mS;
+  }
+
+  private getYears() {
+    const years = ["1985"];
+    for (let i = 1; i < 30; i++) {
+      if (!Math.floor(Math.random() * 5))
+        continue;
+      const element = years[0];
+      const year = parseInt(element) + i;
+      years.push(year.toString());
+    }
+    return years;
+  }
+
+  getRandomNumber() {
+    return Math.floor(Math.random() * 30000 + 20000);
+  }
 }
