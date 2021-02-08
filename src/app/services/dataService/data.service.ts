@@ -25,11 +25,20 @@ interface LocationData {
   providedIn: 'root'
 })
 export class DataService {
+  data = this.generateProjectData();
   get projectsData() {
-    return this.generateProjectData();
+    return this.data.map(x => ({
+      ...x,
+      "Project Negative Values": -1 * (Math.floor(Math.random() * 3))
+    })
+    );
   }
   get servicesData() {
-    return this.generateServiceData();
+    return this.data.map(x => ({
+      ...x,
+      "Project Negative Value": -1 * (Math.floor(Math.random() * 3))
+    })
+    );
   }
   get locationData() {
     return this.generateLocationData();
@@ -56,8 +65,9 @@ export class DataService {
   private getProjectData(year: string): ProjectData {
     return ({
       year,
-      "Project Small Data": (Math.floor(Math.random() * 3)),
-      "Project Large Data": this.getRandomNumber(),
+      "Project A": this.getRandomNumber(),
+      "Project B": this.getRandomNumber(),
+      "Project C": this.getRandomNumber(),
     });
   }
 
@@ -76,8 +86,8 @@ export class DataService {
   private getServiceData(year: string): ServiceData {
     return ({
       year,
-      "Project Small Data": (Math.floor(Math.random() * 10)),
-      "Project Also Small Data": (Math.floor(Math.random() * 10)),
+      "Project A": (Math.floor(Math.random() * 10)),
+      "Project B": (Math.floor(Math.random() * 10)),
     });
   }
 

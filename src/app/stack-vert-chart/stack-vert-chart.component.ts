@@ -35,13 +35,13 @@ export class StackVertChartComponent implements OnInit, AfterViewInit {
 
   }
 
-  setChart(chart:XYChart, dataDisplay) {
+  setChart(chart: XYChart, dataDisplay) {
     if (chart)
       this.chart.dispose();
     this.chart = create(this.chartId, XYChart);
     chart = this.chart;
     chart.data = dataDisplay.data;
-    chart.numberFormatter.numberFormat = "#.a"
+    chart.numberFormatter.numberFormat = "#.a";
 
     let categoryAxis: CategoryAxis = this.setXAxis(chart, dataDisplay);
     //change tooltipText data
@@ -50,7 +50,7 @@ export class StackVertChartComponent implements OnInit, AfterViewInit {
     this.setSeries(dataDisplay);
     setTotalLabelForStack(dataDisplay, this.chart);
     addLegend(chart);
-    
+
 
   }
 
@@ -106,13 +106,13 @@ function createSerie(field: string, name: string, stacked: boolean, dataDisplay,
 }
 
 function addLabelToSerie(series, isLastSerie) {
-  if (isLastSerie) {
-    let valueLabel = series.bullets.push(new LabelBullet());
-    valueLabel.label.text = "{valueY.total}";
-    valueLabel.label.dy = -10;
-    valueLabel.label.hideOversized = false;
-    valueLabel.label.truncate = false;
-  }
+  // if (isLastSerie) {
+  //   let valueLabel = series.bullets.push(new LabelBullet());
+  //   valueLabel.label.text = "{valueY.total}";
+  //   valueLabel.label.dy = -10;
+  //   valueLabel.label.hideOversized = false;
+  //   valueLabel.label.truncate = false;
+  // }
 }
 
 function setTotalLabelForStack(dataDisplay, chart) {
@@ -127,12 +127,12 @@ function setTotalLabelForStack(dataDisplay, chart) {
 }
 
 function setLabelForEachSerie(series, stacked) {
-  const valueLabel: LabelBullet = series.bullets.push(new LabelBullet());
-  valueLabel.label.text = '{valueY.sum}';
-  valueLabel.tooltipText = '{valueY.sum}';
-  valueLabel.label.truncate = false; // don't cut the full label
-  valueLabel.label.dy = -10;
-  valueLabel.label.textAlign = "middle";
+  // const valueLabel: LabelBullet = series.bullets.push(new LabelBullet());
+  // valueLabel.label.text = '{valueY.sum}';
+  // valueLabel.tooltipText = '{valueY.sum}';
+  // valueLabel.label.truncate = false; // don't cut the full label
+  // valueLabel.label.dy = -10;
+  // valueLabel.label.textAlign = "middle";
 
 }
 
@@ -184,8 +184,9 @@ function addLegend(chart: any) {
 function setYAxis(chart: any) {
   let valueAxis = chart.yAxes.push(new ValueAxis());
   valueAxis.cursorTooltipEnabled = false;
-  valueAxis.calculateTotals = true;
   valueAxis.maxZoomFactor = 10000000;
+  valueAxis.calculateTotals = true;
+  valueAxis.strictMinMax = true;
 }
 
 function setXAxisTooltip(categoryAxis: CategoryAxis, chart: any) {
@@ -194,6 +195,7 @@ function setXAxisTooltip(categoryAxis: CategoryAxis, chart: any) {
   axisTooltip.background.cornerRadius = 3;
   axisTooltip.background.pointerLength = 0;
   axisTooltip.dy = -300;
+
 
   chart.cursor = new XYCursor();
   (<XYCursor>chart.cursor).lineX.disabled = true;
