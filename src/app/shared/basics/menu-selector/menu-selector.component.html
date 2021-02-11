@@ -1,0 +1,14 @@
+<div class="menu-selector-container">
+    <div>{{labelStr || ''}}</div>
+    <div class="menu-selector-content" (click)="onMenuSelectedClick()">
+        <span class="title">
+            {{currentSelected?.name}}
+        </span>
+        <div *ngIf="isOpen" class="options-container">
+            <div *ngFor="let op of options" class="options-text">
+                <span (click)="selectItem(op)">{{op.name}}</span>
+            </div>
+        </div>
+
+    </div>
+</div>

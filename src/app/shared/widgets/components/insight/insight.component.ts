@@ -97,8 +97,8 @@ export class InsightComponent implements OnInit, OnDestroy, WidgetComponent {
   }
 
 
-  changeSelect() {
-    this.chartDataDisplay = this.dataService.verticalBarData[this.dataDisplay.name];
+  changeSelect(name) {
+    this.chartDataDisplay = this.dataService.verticalBarData[name];
     this.setInsight();
   }
 

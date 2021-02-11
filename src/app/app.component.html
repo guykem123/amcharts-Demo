@@ -1,41 +1,15 @@
-<!-- <div class="selection-options">
-  <div class="selection-content">
-    <span>Selection for Area</span>
-    <select [(ngModel)]="dataDisplayArea.name" (change)="changeSelectArea()">
-      <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
-        {{ opt.name }}
-      </option>
-    </select>
-  </div>
-  <div class="selection-content">
-    <span>Selection for Vertical</span>
-    <select [(ngModel)]="dataDisplay.name" (change)="changeSelect()">
-      <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
-        {{ opt.name }}
-      </option>
-    </select>
-  </div>
-</div> -->
-
-<!-- <div class="graphs-container">
-  <app-insight></app-insight>
-</div> -->
-
-
-
-
 
 <!-- <h1>Using dashboard-control-content </h1> -->
 
-<!-- <router-outlet></router-outlet> -->
+<router-outlet></router-outlet>
+
+
 
 <!-- <div class="selection-content">
   <span>Selection for Vertical</span>
-  <select [(ngModel)]="dataDisplay.name" (change)="changeSelect()">
-    <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
-      {{ opt.name }}
-    </option>
-  </select>
+ <app-menu-selector (selectedItem)="changeSelect($event)" [labelStr]="'select data display'"
+  [options]="stackVertDataOptions" [currentSelected]="dataDisplay">
+</app-menu-selector>
 </div> -->
 <!-- <div class="graphs-container">
   <div class="page-container grid-container" #dashboardContainer>
@@ -51,10 +25,9 @@
 
 <!-- <dashboard-control-content></dashboard-control-content>  -->
 <!-- <app-insight></app-insight> -->
-<div style="width: 100%; height: 90vh;">
-  <app-vertical-bar [chartId]="chartId" [chartDataDisplay]="chartDataDisplay" [categoryType]="categoryType">
-  </app-vertical-bar>
-</div>
+<!-- <app-vertical-bar [chartId]="chartId" [chartDataDisplay]="chartDataDisplay" [categoryType]="categoryType">
+</app-vertical-bar> -->
+
 
 
 

@@ -1,15 +1,8 @@
 <div class="insight-container">
     <div class="title-selector">
-        <div class="selection-options">
-            <div class="selection-content">
-                <span>Selection for Vertical</span>
-                <select [(ngModel)]="dataDisplay.name" (change)="changeSelect()">
-                    <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
-                        {{ opt.name }}
-                    </option>
-                </select>
-            </div>
-        </div>
+        <app-menu-selector (selectedItem)="changeSelect($event)" [labelStr]="'select data display'"
+            [options]="stackVertDataOptions" [currentSelected]="dataDisplay">
+        </app-menu-selector>
     </div>
     <div *ngIf="isRendering" class="loading-container">
         <app-loading-data></app-loading-data>

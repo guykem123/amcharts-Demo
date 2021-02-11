@@ -62,8 +62,8 @@ export class AppComponent implements OnInit {
     this.categoryType = "Nan";
   }
 
-  changeSelect() {
-    this.chartDataDisplay = this.dataService.verticalBarData[this.dataDisplay.name];
+  changeSelect(name) {
+    this.chartDataDisplay = this.dataService.verticalBarData[name];
   }
 
   changeSelectArea() {

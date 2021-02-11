@@ -1,0 +1,26 @@
+.menu-selector-container {
+  display: flex;
+}
+
+.menu-selector-content {
+  margin-left: 10px;
+}
+
+.menu-selector-content .title {
+  color: blue;
+  cursor: pointer;
+}
+
+.options-container {
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+  border: 1px solid black;
+}
+
+.options-text {
+  padding: 4px 10px;
+  margin: 0px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(258, 258, 258, 0.2);
+}
