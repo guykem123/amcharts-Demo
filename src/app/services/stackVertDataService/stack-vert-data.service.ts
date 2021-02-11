@@ -11,6 +11,7 @@ export interface DataForStackVertBar {
   providedIn: 'root'
 })
 export class StackVertDataService {
+  
   changeDataForVert(dataDisplay: any) {
     this.selectedData.next({ ...dataDisplay, data: this.getDataByName(dataDisplay.name) });
   }

@@ -1,0 +1,9 @@
+<app-loading-data *ngIf="isRendering"></app-loading-data>
+<div class="chart-container vert-chart-container" style="overflow: hidden" [ngClass]="isRendering ? 'close':''">
+    <div class="vert-chart-instance" [id]="chartDivId"></div>
+    <nz-divider></nz-divider>
+    <div class="legend-container" *ngIf="!isRendering && chartDataDisplay.showLegend">
+        <app-legend [series]="series" ></app-legend>
+    </div>
+    <div class="legend-container-svg" [id]="'legend'+chartId" [style.height.px]="legendHeight"></div>
+</div>

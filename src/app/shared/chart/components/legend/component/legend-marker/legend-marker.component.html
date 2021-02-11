@@ -1,0 +1,4 @@
+<div class="marker-content" (click)="onSerieClicked()" [ngClass]="{'hidden':!currentSerieShow}">
+    <div class="color-box" [style.background]="currentSerieShow? marker.color:''"></div>
+    <div class="marker-serie-name" [title]="marker.name">{{marker.name}}</div>
+</div>

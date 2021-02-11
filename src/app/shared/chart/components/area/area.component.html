@@ -1,0 +1,9 @@
+<app-loading-data *ngIf="isRendering"></app-loading-data>
+<div *ngIf="dataIsInsufficient" class="chart-data-not-applicable">Area chart is not applicable</div>
+<div class="chart-container area-chart-container">
+    <div [id]="chartId" class="area-chart-element"></div>
+    <div class="legend-container">
+        <app-legend [series]="series"></app-legend>
+    </div>
+    <div class="legend-container-svg" [id]="'legend'+chartId" [style.height.px]="legendHeight"></div>
+</div>

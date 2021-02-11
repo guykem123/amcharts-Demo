@@ -1,0 +1,16 @@
+<div class="page-container grid-container" #dashboardContainer>
+    <div class="dashboard-grid-size dashboard-grid-view">
+        <ng-container *ngFor='let dashboardControl of dashboardControls'>
+            <div class="single-data dashboard-size entity-display full-width"
+                [style.grid-column-start]='dashboardControl.verticalPosition'
+                [style.grid-row-start]='dashboardControl.horizontalPosition'
+                [style.grid-column-end]='dashboardControl.verticalPosition +dashboardControl.controlWidth'
+                [style.grid-row-end]='dashboardControl.horizontalPosition +dashboardControl.controlHeight'
+                [style.order]="dashboardControl.horizontalPosition" [ngClass]="{'insight':dashboardControl.isInsight}">
+                <dashboard-control-content>
+
+                </dashboard-control-content>
+            </div>
+        </ng-container>
+    </div>
+</div>

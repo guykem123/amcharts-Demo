@@ -1,0 +1,7 @@
+<div class="legends-main-container">
+    <div class="legend-container">
+        <div class="legend-marker" *ngFor="let serie of series">
+            <app-legend-marker [marker]="serie" (markerClicked)="onSerieSelected($event)"></app-legend-marker>
+        </div>
+    </div>
+</div>

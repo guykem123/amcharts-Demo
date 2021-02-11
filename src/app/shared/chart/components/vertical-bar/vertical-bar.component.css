@@ -1,0 +1,16 @@
+.vert-chart-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+
+.vert-chart-container.close {
+  width: 0%;
+  height: 0%;
+}
+
+.vert-chart-instance {
+  flex-grow: 1;
+  max-height: 100%;
+}

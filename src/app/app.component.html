@@ -17,24 +17,50 @@
   </div>
 </div> -->
 
+<!-- <div class="graphs-container">
+  <app-insight></app-insight>
+</div> -->
 
-<div class="graphs-container">
-  <!-- <div class="graph">
-    <app-stack-area-chart></app-stack-area-chart>
-  </div>
-  <div class="graph">
-    <app-stack-area-chart></app-stack-area-chart>
-  </div>
-  <div class="graph">
-    <app-stack-vert-chart></app-stack-vert-chart>
-  </div>
-  <div class="graph">
-    <app-stack-vert-chart></app-stack-vert-chart>
-  </div> -->
-  <!-- <div class="graph">
-    <app-stack-vert-chart></app-stack-vert-chart>
-  </div> -->
-  <div class="graph">
-    <app-stack-vert-chart></app-stack-vert-chart>
-  </div>
+
+
+
+
+<!-- <h1>Using dashboard-control-content </h1> -->
+
+<!-- <router-outlet></router-outlet> -->
+
+<!-- <div class="selection-content">
+  <span>Selection for Vertical</span>
+  <select [(ngModel)]="dataDisplay.name" (change)="changeSelect()">
+    <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
+      {{ opt.name }}
+    </option>
+  </select>
+</div> -->
+<!-- <div class="graphs-container">
+  <div class="page-container grid-container" #dashboardContainer>
+    <div class="dashboard-grid-size dashboard-grid-view">
+      <ng-container *ngFor='let dashboardControl of dashboardControls'>
+        <div class="single-data dashboard-size entity-display full-width"
+          [style.grid-column-start]='dashboardControl.verticalPosition'
+          [style.grid-row-start]='dashboardControl.horizontalPosition'
+          [style.grid-column-end]='dashboardControl.verticalPosition +dashboardControl.controlWidth'
+          [style.grid-row-end]='dashboardControl.horizontalPosition +dashboardControl.controlHeight'
+          [style.order]="dashboardControl.horizontalPosition" [ngClass]="{'insight':dashboardControl.isInsight}"> -->
+
+
+<!-- <dashboard-control-content></dashboard-control-content>  -->
+<!-- <app-insight></app-insight> -->
+<div style="width: 100%; height: 90vh;">
+  <app-vertical-bar [chartId]="chartId" [chartDataDisplay]="chartDataDisplay" [categoryType]="categoryType">
+  </app-vertical-bar>
 </div>
+
+
+
+<!-- </div>
+      </ng-container>
+    </div>
+  </div>
+
+</div> -->

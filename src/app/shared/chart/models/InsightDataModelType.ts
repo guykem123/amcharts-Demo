@@ -1,0 +1,1 @@
+export type InsightDataModelType = "DATE" | "TEXT" | "NUMBER" | "JSON";

@@ -1,0 +1,81 @@
+[
+    {
+        "name": "Grey",
+        "color": "#b5b0b0",
+        "priority": 1,
+        "intend": "More",
+        "intendContain": "More"
+    },
+    {
+        "name": "Amazing Blue",
+        "color": "#1E6EE5",
+        "priority": 1,
+        "intend": "Current"
+    },
+    {
+        "name": "Amazing Blue Light",
+        "color": "#ADDCF4",
+        "priority": 1,
+        "intend": "Previous"
+    },
+    {
+        "name": "Spectacular Gold",
+        "color": "#ECDA7C",
+        "priority": 1,
+        "intend": "Projection"
+    },
+    {
+        "name": "Dust Red",
+        "color": "#f74e57",
+        "priority": 2,
+        "intend": ""
+    },
+    {
+        "name": "Volcano",
+        "color": "#fb7649",
+        "priority": 3,
+        "intend": ""
+    },
+    {
+        "name": "Sunset Orange",
+        "color": "#fbbd43",
+        "priority": 4,
+        "intend": ""
+    },
+    {
+        "name": "Poler Green",
+        "color": "#75d048",
+        "priority": 5,
+        "intend": ""
+    },
+    {
+        "name": "Cyan",
+        "color": "#42cece",
+        "priority": 6,
+        "intend": ""
+    },
+    {
+        "name": "Daybreak Blue",
+        "color": "#46a6ff",
+        "priority": 7,
+        "intend": ""
+    },
+    {
+        "name": "Geek Blue",
+        "color": "#5976ef",
+        "priority": 8,
+        "intend": ""
+    },
+    {
+        "name": "Purple",
+        "color": "#8e58da",
+        "priority": 9,
+        "intend": ""
+    },
+    {
+        "name": "Red",
+        "color": "#ff3838",
+        "priority": 11,
+        "intend": ""
+    }
+]

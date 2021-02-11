@@ -5,6 +5,10 @@
   flex-grow: 1;
 }
 
+.chart-container {
+  width: 100%;
+}
+
 .selection-options {
   display: flex;
   width: 100%;
@@ -34,4 +38,62 @@
   height: calc(100vh - 16px);
   display: flex;
   flex-wrap: wrap;
+}
+
+
+
+
+.grid-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-grid-view {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  min-height: 700px;
+}
+
+
+.add-filter-btn.dashboard {
+  background-color: white;
+  color: #1e6ee5;
+}
+
+.date-filter-option {
+  padding: 5px;
+}
+
+.date-selection-option {
+  padding: 5px 10px;
+}
+
+.date-picker {
+  padding-right: 16px;
+}
+
+.select-scope-text {
+  padding-left: 5px;
+}
+
+@media only screen and (max-width: 800px) {
+  .dashboard-grid-view {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .full-width {
+    width: 95%;
+  }
+  .single-data {
+    min-height: 200px;
+  }
+  .single-data.insight {
+    min-height: 400px;
+  }
+  .add-filter-btn-wrapper {
+    padding-top: 10px;
+  }
 }

@@ -1,0 +1,15 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  flex-direction: column;
+}
+
+.loading-text {
+  padding-bottom: 5px;
+}
+
+.loading-icon {
+  font-size: 20px;
+}

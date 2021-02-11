@@ -68,6 +68,7 @@ export class DataService {
       "Project A": this.getRandomNumber(),
       "Project B": this.getRandomNumber(),
       "Project C": this.getRandomNumber(),
+      "Negative": (Math.floor(Math.random() * -10)),
     });
   }
 
@@ -86,8 +87,8 @@ export class DataService {
   private getServiceData(year: string): ServiceData {
     return ({
       year,
-      "Project A": (Math.floor(Math.random() * 10)),
-      "Project B": (Math.floor(Math.random() * 10)),
+      "Service A": (Math.floor(Math.random() * 10)),
+      "Service B": (Math.floor(Math.random() * 10)),
     });
   }
 
@@ -111,4 +112,14 @@ export class DataService {
   getRandomNumber() {
     return Math.floor(Math.random() * 30000 + 20000);
   }
+}
+
+function getRandomWord() {
+  let word = '';
+  const chars = "abcdefghijklmnopqrstuvwxyz";
+  for (let i = 0; i < 6; i++) {
+    const index = Math.floor(Math.random() * chars.length);
+    word += chars[index];
+  }
+  return word;
 }

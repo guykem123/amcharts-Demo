@@ -1,0 +1,27 @@
+<div class="insight-container">
+    <div class="title-selector">
+        <div class="selection-options">
+            <div class="selection-content">
+                <span>Selection for Vertical</span>
+                <select [(ngModel)]="dataDisplay.name" (change)="changeSelect()">
+                    <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
+                        {{ opt.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="isRendering" class="loading-container">
+        <app-loading-data></app-loading-data>
+    </div>
+    <div class="insight-content" [ngClass]="{'close':isRendering}">
+        <div *ngIf="chartMetadataIsInvalid && !isRendering" class="chart-metadata-invalid-container">
+            <app-data-not-available></app-data-not-available>
+        </div>
+        <div class="chart-container" [ngClass]="{'invalid': chartMetadataIsInvalid, 'expend': isChartNeedExpend}">
+            <ng-template #container class="content">
+            </ng-template>
+            <!-- <app-vertical-bar [chartId]="chartId" [chartDataDisplay]="chartDataDisplay" [categoryType]="categoryType" ></app-vertical-bar> -->
+        </div>
+    </div>
+</div>
