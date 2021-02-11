@@ -1,39 +1,44 @@
+<!-- <div class="graphs-container">
+  <app-insight></app-insight>
+</div> -->
+
+
+
+
 
 <!-- <h1>Using dashboard-control-content </h1> -->
 
-<router-outlet></router-outlet>
+<!-- <router-outlet></router-outlet> -->
 
+<!-- <div style="display: flex; align-items: center;justify-content: center;">
 
+  <app-menu-selector (selectedItem)="changeSelect($event)" [labelStr]="'select data display'"
+    [options]="stackVertDataOptions" [currentSelected]="dataDisplay">
+  </app-menu-selector>
+
+</div> -->
 
 <!-- <div class="selection-content">
   <span>Selection for Vertical</span>
- <app-menu-selector (selectedItem)="changeSelect($event)" [labelStr]="'select data display'"
-  [options]="stackVertDataOptions" [currentSelected]="dataDisplay">
-</app-menu-selector>
+  <select [(ngModel)]="dataDisplay.name" (change)="changeSelect()">
+    <option *ngFor="let opt of stackVertDataOptions" [value]="opt.name">
+      {{ opt.name }}
+    </option>
+  </select>
 </div> -->
-<!-- <div class="graphs-container">
+<div class="graphs-container">
   <div class="page-container grid-container" #dashboardContainer>
     <div class="dashboard-grid-size dashboard-grid-view">
       <ng-container *ngFor='let dashboardControl of dashboardControls'>
         <div class="single-data dashboard-size entity-display full-width"
-          [style.grid-column-start]='dashboardControl.verticalPosition'
-          [style.grid-row-start]='dashboardControl.horizontalPosition'
-          [style.grid-column-end]='dashboardControl.verticalPosition +dashboardControl.controlWidth'
-          [style.grid-row-end]='dashboardControl.horizontalPosition +dashboardControl.controlHeight'
-          [style.order]="dashboardControl.horizontalPosition" [ngClass]="{'insight':dashboardControl.isInsight}"> -->
-
-
-<!-- <dashboard-control-content></dashboard-control-content>  -->
-<!-- <app-insight></app-insight> -->
-<!-- <app-vertical-bar [chartId]="chartId" [chartDataDisplay]="chartDataDisplay" [categoryType]="categoryType">
-</app-vertical-bar> -->
-
-
-
-
-<!-- </div>
+          [style.grid-column-start]='dashboardControl.horizontalPosition'
+          [style.grid-row-start]='dashboardControl.verticalPosition'
+          [style.grid-column-end]='dashboardControl.horizontalPosition +dashboardControl.controlWidth'
+          [style.grid-row-end]='dashboardControl.verticalPosition +dashboardControl.controlHeight'
+          [style.order]="dashboardControl.verticalPosition" [ngClass]="{'insight':dashboardControl.isInsight}">
+          <app-insight></app-insight>
+        </div>
       </ng-container>
     </div>
   </div>
-
-</div> -->
+</div>
