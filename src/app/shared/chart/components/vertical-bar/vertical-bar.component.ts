@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 
-import { create, color as createColor, DateFormatter, options, string, number, useTheme, Container, percent, NumberFormatter, color } from '@amcharts/amcharts4/core';
+import { create, color as createColor, DateFormatter, options, string, number, useTheme, Container, percent, NumberFormatter, color, min } from '@amcharts/amcharts4/core';
 import { XYChart, ColumnSeries, ValueAxis, CategoryAxis, Legend, LabelBullet, DateAxis, XYSeries } from '@amcharts/amcharts4/charts';
 import { SerieMetadata } from '../../models/SerieMetadata';
 import { ChartService } from '../../services/chartService/chart.service';
@@ -37,6 +37,7 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
   legendHeight: number;
   subscriptions: Subscription = new Subscription();
   series: LegendMarker[] = [];
+  valueAxis: any;
 
   constructor(
     private chartService: ChartService,
@@ -99,7 +100,7 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
       this.chartService.setToolTip(this.chartDataDisplay, this.chartDataDisplay.data,
         this.chart.colors.list, this.chartDataDisplay.metadata.seriesMetadata, this.chosenType?.class);
       this.chartService.setPdfFunc(this.chartId, this.chart);
-      this.setYAxes(this.chart);
+      this.valueAxis = this.setYAxes(this.chart);
       this.setXAxes(this.chart);
       const series = this.chartDataDisplay.metadata.seriesMetadata;
       for (let i = 0; i < series.length; i++) {
@@ -157,16 +158,14 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
    * set label foe stack vertical chart
    */
   private setTotalLabelForStack() {
-    if (this.chartDataDisplay.showSerieLabel && this.chartDataDisplay.isStacked) {
-      const totalSeries = this.chart.series.push(new ColumnSeries());
-      this.chart.data.forEach(chartCategoryV => chartCategoryV.totalSeriesValues = 0);//this is for aggregate the sum of all series on one category
-      totalSeries.dataFields.valueY = 'totalSeriesValues';
-      totalSeries.dataFields[this.chosenType.seriesKey] = this.chartDataDisplay.metadata.categoryAxisKey;
-      totalSeries.stacked = true;
-      totalSeries.hiddenInLegend = true;
-      totalSeries.columns.template.strokeOpacity = 0;
-      this.setLabelForEachSerie(totalSeries, true);
-    }
+    const totalSeries = this.chart.series.push(new ColumnSeries());
+    this.chart.data.forEach(chartCategoryV => chartCategoryV.totalSeriesValues = 0);//this is for aggregate the sum of all series on one category
+    totalSeries.dataFields.valueY = 'totalSeriesValues';
+    totalSeries.dataFields[this.chosenType.seriesKey] = this.chartDataDisplay.metadata.categoryAxisKey;
+    totalSeries.stacked = true;
+    totalSeries.hiddenInLegend = true;
+    totalSeries.columns.template.strokeOpacity = 0;
+    this.setLabelForEachSerie(totalSeries, true);
   }
 
   setChartColors(seriesMetadata: SerieMetadata[]) {
@@ -288,10 +287,25 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   private setLabelForEachSerie(series: ColumnSeries, stacked: boolean) {
+
+    // this.chart.events.on("ready", () => {
+    //   this.check(series);
+    //   this.chart.series.values.forEach(x => {
+    //     x.events.on('shown', () => {
+    //       this.check(series);
+    //     });
+    //     x.events.on('hidden', () => {
+    //       this.check(series);
+    //     });
+    //   }
+    //   );
+    // });
+
+
     const valueLabel: LabelBullet = series.bullets.push(new LabelBullet());
     if (stacked) {
-      valueLabel.label.text = '{valueY.total}';
-      valueLabel.tooltipText = '{valueY.total.formatNumber("#,###.00")}';
+      valueLabel.label.text = '{valueY.sum}';
+      valueLabel.tooltipText = '{valueY.sum.formatNumber("#,###.00")}';
     } else {
       valueLabel.label.text = '{valueY}';
       valueLabel.tooltipText = '{valueY.formatNumber("#,###.00")}';
@@ -324,6 +338,36 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
     });
   }
 
+  private check(series: ColumnSeries) {
+    let init = this.getMinMax(series);
+    const interval = setInterval(() => {
+      const newInit = this.getMinMax(series);
+      if (init.min == newInit.min && init.max == newInit.max) {
+        clearInterval(interval);
+        console.log(init.min);
+
+      } else {
+        init = newInit;
+      }
+
+      if (init.min >= 0) {
+        this.valueAxis.min = 0;
+      }
+      else {
+        this.valueAxis.min = undefined;
+      }
+    }, 300);
+  }
+
+  private getMinMax(series: ColumnSeries) {
+    const values = <any>(series.columns).values.map(v => v.dataItem.values.valueY.sum);
+    // console.log(values);
+    const max = Math.max(...values);
+
+    const min = Math.min(...values);
+    return { min, max };
+  }
+
   getNewNumberFormatter() {
     const numberFormatter = new NumberFormatter();
     numberFormatter.smallNumberPrefixes = [];
@@ -334,7 +378,7 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
     const valueAxis: ValueAxis = chart.yAxes.push(new ValueAxis());
     valueAxis.extraMax = 0.1;
     valueAxis.maxZoomFactor = 10000000;
-    valueAxis.strictMinMax = true;
+    // valueAxis.strictMinMax = true;
     valueAxis.renderer.grid.template.align = 'right';
     valueAxis.numberFormatter = this.getNewNumberFormatter();
     valueAxis.numberFormatter.numberFormat = '#a';
@@ -345,6 +389,11 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
     valueAxis.renderer.grid.template.strokeDasharray = this.chartDataDisplay.yAxisGridDashed ? '4,4' : '';
     valueAxis.renderer.labels.template.disabled = !this.chartDataDisplay.yAxisShowLabels;
     valueAxis.calculateTotals = true;
+    chart.events.on("ready", (ev) => {
+      console.log("valueAxis - minDefined",valueAxis.minDefined)
+      valueAxis.min = valueAxis.minDefined;
+    })
+    return valueAxis;
   }
 
   private disableValueLineOnZero(valueAxis) {
