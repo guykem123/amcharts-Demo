@@ -26,25 +26,25 @@ export class AppComponent implements OnInit {
     this.dashboardControls = [
       {
         "controlWidth": 1,
-        "controlHeight": 1,
+        "controlHeight": 2,
         "horizontalPosition": 1,
         "verticalPosition": 1,
       },
       {
         "controlWidth": 1,
-        "controlHeight": 1,
+        "controlHeight": 2,
         "horizontalPosition": 1,
         "verticalPosition": 2,
       },
       {
         "controlWidth": 1,
-        "controlHeight": 1,
+        "controlHeight": 2,
         "horizontalPosition": 1,
         "verticalPosition": 3,
       },
       {
         "controlWidth": 1,
-        "controlHeight": 1,
+        "controlHeight": 2,
         "horizontalPosition": 1,
         "verticalPosition": 4,
       },

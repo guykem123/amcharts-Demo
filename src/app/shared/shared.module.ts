@@ -1,17 +1,21 @@
-import { NgModule } from "@angular/core";
-import { ReactiveFormsModule } from "@angular/forms";
-import { ChartModule } from "./chart/chart.module";
+import { NgModule } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { WidgetsModule } from './widgets/widgets.module';
 
 @NgModule({
   declarations: [
   ],
   imports: [
     ReactiveFormsModule,
-    ChartModule,
+    WidgetsModule,
   ],
   exports: [
-    ChartModule,
+    WidgetsModule,
+  ],
+  providers: [
+    DatePipe,
   ]
 })
 export class SharedModule { }

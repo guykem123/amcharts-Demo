@@ -1,46 +1,22 @@
-.graph {
-  padding: 10px;
-  border: 1px solid black;
-  width: 100%;
+.app {
+  overflow-y: hidden;
+}
+.app-content {
   flex-grow: 1;
+  margin-bottom: 2px;
 }
-
-.chart-container {
+.current-page-content {
   width: 100%;
+  height: 100%;
+}
+.app-footer {
+  position: re;
+  bottom: 0px;
 }
 
-.selection-options {
-  display: flex;
-  width: 100%;
-  height: 50px;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
+.main-app-cont div {
+  margin: 10px;
 }
-
-.selection-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-right: 30px;
-  font-size: 14px;
-}
-.selection-content span {
-  margin-right: 20px;
-}
-
-.selection-content select {
-  font-size: inherit;
-}
-
-.graphs-container {
-  width: 100%;
-  height: calc(100vh - 16px);
-  display: flex;
-  flex-wrap: wrap;
-}
-
-
 
 
 .grid-container {
@@ -50,6 +26,10 @@
   justify-content: center;
 }
 
+.dashboard .page-main-title {
+  flex-direction: row;
+}
+
 .dashboard-grid-view {
   display: grid;
   grid-template-rows: 1fr 1fr 1fr;
@@ -57,19 +37,27 @@
   min-height: 700px;
 }
 
-
 .add-filter-btn.dashboard {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   background-color: white;
   color: #1e6ee5;
+}
+
+.scope-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard-date-filter-container {
+  display: flex;
+  justify-content: space-between;
 }
 
 .date-filter-option {
   padding: 5px;
 }
 
-.date-selection-option {
-  padding: 5px 10px;
-}
 
 .date-picker {
   padding-right: 16px;
@@ -78,13 +66,31 @@
 .select-scope-text {
   padding-left: 5px;
 }
+[nz-menu-item] {
+  width: 124px;
+  padding-bottom: 7px;
+  padding-top: 7px;
+
+}
+
+[nz-menu] {
+  padding-top: 7px;
+  padding-right: 10px;
+  padding-left: 7px;
+  padding-bottom: 7px;
+}
 
 @media only screen and (max-width: 800px) {
+  .dashboard .page-main-title {
+    flex-direction: column;
+  }
+
   .dashboard-grid-view {
     display: flex;
     flex-wrap: wrap;
   }
   .full-width {
+    margin: 16px;
     width: 95%;
   }
   .single-data {
@@ -92,8 +98,5 @@
   }
   .single-data.insight {
     min-height: 400px;
-  }
-  .add-filter-btn-wrapper {
-    padding-top: 10px;
   }
 }

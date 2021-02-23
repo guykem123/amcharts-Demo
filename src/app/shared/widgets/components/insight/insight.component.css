@@ -1,0 +1,154 @@
+.insight-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.insight-container.close {
+  display: none;
+  width: 0%;
+  height: 0%;
+}
+
+.total-data-container {
+  padding: 0px 24px;
+  padding-bottom: 16px;
+  display: flex;
+}
+
+.total-data-content {
+  display: flex;
+  flex-direction: column;
+  background: #f9f9f9;
+  border-radius: 2px;
+  width: 160px;
+  height: 70px;
+  padding: 16px;
+  justify-content: space-between;
+}
+.total-data-content .title {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 100%;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.85);
+  opacity: 0.6;
+}
+
+.total-data-content .amount {
+  padding-top: 5px;
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 100%;
+  letter-spacing: -1px;
+
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.chart-container {
+  width: 100%;
+  height: 380px;
+}
+
+.chart-container.invalid {
+  width: 0px;
+  height: 0px;
+}
+
+.inform-chart-data-invalid {
+  width: 100%;
+  height: 100%;
+}
+
+.title-selector {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 26px;
+  padding-top: 10px;
+}
+
+.insight-filter-setting-dropdown {
+  min-width: 120px;
+  bottom: 15px;
+  font-size: 14px;
+  right: 10px;
+}
+
+.export {
+  margin: 0px 6px;
+}
+
+.chart-settings-options {
+  margin-right: 10px;
+}
+
+.insight-filter-setting {
+  margin: 0px 16px;
+}
+
+.charts-options-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chart-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  width: 24px;
+  height: 24px;
+  border-color: #e8e8e8;
+  background: #e8e8e8;
+  color: #595959;
+}
+
+.chart-icon {
+  font-size: 10px;
+  color: inherit;
+}
+
+.chart-btn.selected {
+  border-color: #1e6ee5;
+  background: #1e6ee5;
+  color: #ffffff;
+}
+
+.chart-types {
+  width: 100%;
+  height: 50px;
+}
+
+.cost-filters {
+  margin: 0px 10px;
+  height: 38px;
+}
+
+.filter-title {
+  padding-right: 10px;
+}
+
+.nz-divider {
+  margin: 16px 0px;
+}
+.chart-metadata-invalid-container {
+  flex-grow: 1;
+}
+
+@media screen and (min-width: 600px) {
+  .export {
+    margin: 0px 8px;
+  }
+
+  .chart-settings-options {
+    margin-right: 16px;
+  }
+
+  .chart-container {
+    height: 100%;
+  }
+}

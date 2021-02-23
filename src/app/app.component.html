@@ -1,10 +1,15 @@
-<div style="display: flex; align-items: center;justify-content: center;">
-  <app-menu-selector (selectedItem)="changeSelect($event)" [labelStr]="'select data display'"
-    [options]="stackVertDataOptions" [currentSelected]="dataDisplay">
-  </app-menu-selector>
-</div>
 
-<div style="width: 100%; height: 90vh;">
-  <app-vertical-bar [chartId]="chartId" [chartDataDisplay]="chartDataDisplay" [categoryType]="categoryType">
-  </app-vertical-bar>
+
+<div class="dashboard-grid-size dashboard-grid-view">
+  <ng-container *ngFor='let dashboardControl of dashboardControls'>
+      <div class="single-data dashboard-size entity-display full-width"
+          [style.grid-column-start]='dashboardControl.verticalPosition'
+          [style.grid-row-start]='dashboardControl.horizontalPosition'
+          [style.grid-column-end]='dashboardControl.verticalPosition +dashboardControl.controlWidth'
+          [style.grid-row-end]='dashboardControl.horizontalPosition +dashboardControl.controlHeight'
+          [style.order]="dashboardControl.horizontalPosition" [ngClass]="{'insight':dashboardControl.isInsight}">
+          <app-insight>
+          </app-insight>
+      </div>
+  </ng-container>
 </div>
