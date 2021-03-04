@@ -30,13 +30,12 @@ export class NewDataService {
       { key: "Project A", title: "Project A" },
       { key: "Project B", title: "Project B" },
       { key: "Project C", title: "Project C" },
-      { key: "Negative", title: "Negative" },
     ];
     return displayData;
   }
 
   get serviceDataVert() {
-    const displayData = this.chartService.getChartDisplayData(ChartTypeEnum.VERTICAL_BAR);
+  const displayData = this.chartService.getChartDisplayData(ChartTypeEnum.STACKED_VERTICAL_BAR);
     displayData.data = this.dataService.generateServiceData();
     displayData.metadata.categoryAxisKey = 'year';
     displayData.metadata.seriesMetadata = [
@@ -47,7 +46,7 @@ export class NewDataService {
   }
 
   get locationDataVert() {
-    const displayData = this.chartService.getChartDisplayData(ChartTypeEnum.VERTICAL_BAR);
+    const displayData = this.chartService.getChartDisplayData(ChartTypeEnum.STACKED_VERTICAL_BAR);
     displayData.data = this.dataService.generateLocationData();
     displayData.metadata.categoryAxisKey = 'Month';
     displayData.metadata.seriesMetadata = [

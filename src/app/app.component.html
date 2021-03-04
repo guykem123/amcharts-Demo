@@ -1,15 +1,10 @@
-
-
-<div class="dashboard-grid-size dashboard-grid-view">
-  <ng-container *ngFor='let dashboardControl of dashboardControls'>
-      <div class="single-data dashboard-size entity-display full-width"
-          [style.grid-column-start]='dashboardControl.verticalPosition'
-          [style.grid-row-start]='dashboardControl.horizontalPosition'
-          [style.grid-column-end]='dashboardControl.verticalPosition +dashboardControl.controlWidth'
-          [style.grid-row-end]='dashboardControl.horizontalPosition +dashboardControl.controlHeight'
-          [style.order]="dashboardControl.horizontalPosition" [ngClass]="{'insight':dashboardControl.isInsight}">
-          <app-insight>
-          </app-insight>
-      </div>
-  </ng-container>
+<div class="charts-content">
+  <div class="chart-container">
+    <app-vertical-bar [chartId]="'chart12'" [chartDataDisplay]="chartDataDisplay" showChartLegendDivide="true">
+    </app-vertical-bar>
+  </div>
+  <div class="chart-container">
+    <app-vertical-bar [chartId]="'chart13'" [chartDataDisplay]="chartDataDisplay2" showChartLegendDivide="true">
+    </app-vertical-bar>
+  </div>
 </div>

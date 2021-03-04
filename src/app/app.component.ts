@@ -19,6 +19,12 @@ export class AppComponent implements OnInit {
   dataDisplay;
   dataDisplayArea;
   dashboardControls: any[];
+
+  items = [{ name: 'set 1', value: "Projects" }, { name: 'set 2', value: "Services" }, { name: 'set 3', value: "Locations" }];
+  selectedItem: any = this.items[0];
+  chartDataDisplay2: XYChartsDisplayData;
+
+
   constructor(
     private stackVertService: StackVertDataService,
     private dataService: NewDataService
@@ -51,7 +57,7 @@ export class AppComponent implements OnInit {
     ];
   }
 
-  
+
   ngOnInit(): void {
     this.chartId = "firstChart";
     this.chartDivId = "chartdivid";
@@ -59,6 +65,7 @@ export class AppComponent implements OnInit {
     this.dataDisplay = { ...this.stackVertDataOptions[0] };
     this.dataDisplayArea = { ...this.stackVertDataOptions[0] };
     this.chartDataDisplay = this.dataService.verticalBarData.Projects;
+    this.chartDataDisplay2 = this.dataService.verticalBarData.Services;
     this.categoryType = "Nan";
   }
 
@@ -68,5 +75,10 @@ export class AppComponent implements OnInit {
 
   changeSelectArea() {
     this.stackVertService.changeDataForArea(this.stackVertDataOptions.find(x => x.name == this.dataDisplayArea.name));
+  }
+
+  onChange(ev) {
+    this.selectedItem = this.items[ev.target.options.selectedIndex];
+    this.chartDataDisplay = this.dataService.verticalBarData[this.selectedItem.value];
   }
 }

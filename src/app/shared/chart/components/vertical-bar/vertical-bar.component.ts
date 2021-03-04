@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 
-import { create, color as createColor, DateFormatter, options, string, number, useTheme, Container, percent, NumberFormatter, color, min } from '@amcharts/amcharts4/core';
+import { create, color as createColor, DateFormatter, options, string, number, useTheme, Container, percent, NumberFormatter, color, Label } from '@amcharts/amcharts4/core';
 import { XYChart, ColumnSeries, ValueAxis, CategoryAxis, Legend, LabelBullet, DateAxis, XYSeries } from '@amcharts/amcharts4/charts';
 import { SerieMetadata } from '../../models/SerieMetadata';
 import { ChartService } from '../../services/chartService/chart.service';
@@ -13,7 +13,6 @@ import { Subscription } from 'rxjs';
 import { NumberFormatService } from '../../services/numberFormatService/number-format.service';
 import { LegendMarker } from '../../models/LegendMarker';
 
-let num = 1;
 @Component({
   selector: 'app-vertical-bar',
   templateUrl: './vertical-bar.component.html',
@@ -22,7 +21,6 @@ let num = 1;
 export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges, IChartComponent {
 
   @Input() chartId: string;
-  chartDivId: string;
   @Input() chartDataDisplay: XYChartsDisplayData;
   @Input() categoryType: any;
   @Input() showChartLegendDivide: boolean;
@@ -37,7 +35,7 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
   legendHeight: number;
   subscriptions: Subscription = new Subscription();
   series: LegendMarker[] = [];
-  valueAxis: any;
+  valueAxis: ValueAxis;
 
   constructor(
     private chartService: ChartService,
@@ -48,9 +46,6 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
       categoryType: { class: CategoryAxis, keyName: 'category', seriesKey: 'categoryX', xAxisTooltip: "category" }
     };
     options.autoSetClassName = true;
-    this.onSideBarChange();
-
-    this.chartDivId = getRandomWord();
   }
 
 
@@ -59,18 +54,12 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
       this.setChart();
   }
 
-
-  private onSideBarChange() {
-
-  }
-
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
     this.disposeChart();
   }
 
   private disposeChart() {
-    console.log("dispose", this.chart.id);
     this.chartService.removePdfFunc(this.chartId);
     this.chart?.dispose();
     delete this.chart;
@@ -81,26 +70,24 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   setChart() {
-    if (this.chart)
+    if (this.chart) {
       this.disposeChart();
+    }
     if (this.chartDataDisplay && this.chartDataDisplay.data.length) {
-      this.chart = create(this.chartDivId, XYChart);
-      this.chart.id = num.toString();
-      num++;
-      this.series = [];
-      console.log("create", this.chart.id);
+
+      this.chart = create(this.chartId, XYChart);
       this.chart.zoomOutButton.disabled = true;
       this.chart.numberFormatter.smallNumberPrefixes = [];
       this.chart.dateFormatter.dateFormat = "yyyy-MM-dd";
       this.setMoreOptionInStart();
       const categoryFirstValue = this.chartDataDisplay.data[0][this.chartDataDisplay.metadata.categoryAxisKey];
-      this.chosenType = this.categoryType == "DATE" ? this.types.dateType : this.types.categoryType;
+      this.chosenType = categoryFirstValue?.match(/^[0-9]+[\-.][0-9]+[\-.][0-9]+$/g) ? this.types.dateType : this.types.categoryType;
       this.chart.data = this.chartDataDisplay.data;
       this.setChartColors(this.chartDataDisplay.metadata.seriesMetadata);
       this.chartService.setToolTip(this.chartDataDisplay, this.chartDataDisplay.data,
         this.chart.colors.list, this.chartDataDisplay.metadata.seriesMetadata, this.chosenType?.class);
       this.chartService.setPdfFunc(this.chartId, this.chart);
-      this.valueAxis = this.setYAxes(this.chart);
+      this.setYAxes(this.chart);
       this.setXAxes(this.chart);
       const series = this.chartDataDisplay.metadata.seriesMetadata;
       for (let i = 0; i < series.length; i++) {
@@ -109,8 +96,9 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
         this.createSeries(this.chart, serie.key, serie.title,
           serie.tooltip, this.chartDataDisplay.isStacked, serieColorHex);
       }
-      // this.chartService.addLegend(this.chart, this);
+      this.chartService.addLegend(this.chart, this);
       this.setTotalLabelForStack();
+      this.sortTheChartCategoryValues();
       this.chart.events.on('ready', (ev) => {
         this.isRendering = false;
         this.chartReady.emit(this.chartDataDisplay);
@@ -158,14 +146,16 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
    * set label foe stack vertical chart
    */
   private setTotalLabelForStack() {
-    const totalSeries = this.chart.series.push(new ColumnSeries());
-    this.chart.data.forEach(chartCategoryV => chartCategoryV.totalSeriesValues = 0);//this is for aggregate the sum of all series on one category
-    totalSeries.dataFields.valueY = 'totalSeriesValues';
-    totalSeries.dataFields[this.chosenType.seriesKey] = this.chartDataDisplay.metadata.categoryAxisKey;
-    totalSeries.stacked = true;
-    totalSeries.hiddenInLegend = true;
-    totalSeries.columns.template.strokeOpacity = 0;
-    this.setLabelForEachSerie(totalSeries, true);
+    if (this.chartDataDisplay.showSerieLabel && this.chartDataDisplay.isStacked) {
+      const totalSeries = this.chart.series.push(new ColumnSeries());
+      this.chart.data.forEach(chartCategoryV => chartCategoryV.totalSeriesValues = 0);//this is for aggregate the sum of all series on one category
+      totalSeries.dataFields.valueY = 'totalSeriesValues';
+      totalSeries.dataFields[this.chosenType.seriesKey] = this.chartDataDisplay.metadata.categoryAxisKey;
+      totalSeries.stacked = true;
+      totalSeries.hiddenInLegend = true;
+      totalSeries.columns.template.strokeOpacity = 0;
+      this.setLabelForEachSerie(totalSeries, true);
+    }
   }
 
   setChartColors(seriesMetadata: SerieMetadata[]) {
@@ -275,9 +265,9 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
     serie.dataFields.valueY = field;
     serie.dataFields[this.chosenType.seriesKey] = this.chartDataDisplay.metadata.categoryAxisKey;
     serie.name = name;
-    // if (tooltip) {//set tooltip only if exist
-    //   serie.columns.template.tooltipHTML = `{${tooltip}}`;
-    // }
+    if (tooltip) {//set tooltip only if exist
+      serie.columns.template.tooltipHTML = `{${tooltip}}`;
+    }
     serie.columns.template.tooltipPosition = 'pointer';
     serie.columns.template.maxWidth = 150;
     serie.stacked = stacked;
@@ -287,23 +277,9 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   private setLabelForEachSerie(series: ColumnSeries, stacked: boolean) {
-
-    // this.chart.events.on("ready", () => {
-    //   this.check(series);
-    //   this.chart.series.values.forEach(x => {
-    //     x.events.on('shown', () => {
-    //       this.check(series);
-    //     });
-    //     x.events.on('hidden', () => {
-    //       this.check(series);
-    //     });
-    //   }
-    //   );
-    // });
-
-
     const valueLabel: LabelBullet = series.bullets.push(new LabelBullet());
     if (stacked) {
+      this.setSeriesMinValue(series);
       valueLabel.label.text = '{valueY.sum}';
       valueLabel.tooltipText = '{valueY.sum.formatNumber("#,###.00")}';
     } else {
@@ -319,38 +295,88 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
         return num;
       return v;
     });
+    let isChanged = false;
     valueLabel.label.events.on("sizechanged", (ev) => {
+
       const label = ev.target;
-      if (!label.availableWidth)
+      if (!label.availableWidth || isChanged)
         return;
-      else if (label.availableWidth >= 30) {
-        valueLabel.fontSize = 10;
+      const width = Math.round(label.availableWidth);
+      if (width >= 60) {
+        this.setColumnLabels(valueLabel, width, 15);
       }
-      else if (label.availableWidth >= 20) {
-        valueLabel.fontSize = 8;
+      else if (width >= 30) {
+        this.setColumnLabels(valueLabel, width, 10);
       }
-      else if (label.availableWidth >= 12) {
-        valueLabel.fontSize = 7;
+      else if (width >= 20) {
+        this.setColumnLabels(valueLabel, width, 8);
+      }
+      else if (width >= 15) {
+        this.setColumnLabels(valueLabel, width, 11, true);
+      }
+      else if (width >= 10) {
+        this.setColumnLabels(valueLabel, width, 10, true);
+      }
+      else if (width >= 7) {
+        this.setColumnLabels(valueLabel, width, 8, true);
+      }
+      else if (width >= 4) {
+        this.setColumnLabels(valueLabel, width, 6, true);
+      }
+      else if (width >= 3) {
+        this.setColumnLabels(valueLabel, width, 3, true);
       }
       else {
-        valueLabel.disabled = true;
+        this.setColumnLabels(valueLabel, width, 0, true);
       }
+      isChanged = true;
     });
   }
 
-  private check(series: ColumnSeries) {
-    let init = this.getMinMax(series);
+  private setColumnLabels(labelsContainer: LabelBullet, width: number, fontSize: number, rotation?: boolean) {
+    labelsContainer.fontSize = fontSize;
+
+    if (rotation) {
+      labelsContainer.rotation = -90;
+      labelsContainer.dy = width >= 15 ? -25 : width >= 10 ? -20 : width >= 5 ? -15 : -10;
+      labelsContainer.dx = 10;
+    }
+  }
+
+  getNewNumberFormatter() {
+    const numberFormatter = new NumberFormatter();
+    numberFormatter.smallNumberPrefixes = [];
+    return numberFormatter;
+  }
+
+  private setSeriesMinValue(serie: ColumnSeries) {
+    this.chart.events.on("ready", () => {
+      this.checkStackColumnsTotalValue(serie);//one on first init
+      //one on series hide/show (total value has changed)
+      this.chart.series.values.forEach(x => {
+        x.events.on('shown', () => {
+          this.checkStackColumnsTotalValue(serie);
+        });
+        x.events.on('hidden', () => {
+          this.checkStackColumnsTotalValue(serie);
+        });
+      }
+      );
+    });
+  }
+
+  private checkStackColumnsTotalValue(series: ColumnSeries) {
+    let init = this.getMinMax(series);//get columns min and max - e.g. max:23000,min:20000 or max:-1 min:-10
     const interval = setInterval(() => {
       const newInit = this.getMinMax(series);
       if (init.min == newInit.min && init.max == newInit.max) {
         clearInterval(interval);
-        console.log(init.min);
-
       } else {
         init = newInit;
       }
-
-      if (init.min >= 0) {
+      const valueAxisCurrentMax = (<any>this.valueAxis)._finalMax || 1;
+      //if min value is more the 0 the chart min value displayed will be 0 else it will be undefined so negative values could be displayed
+      if ((init.min >= 0 && init.max >= valueAxisCurrentMax * 0.8) || (init.min >= -0.1 && init.max >= 10)) {
         this.valueAxis.min = 0;
       }
       else {
@@ -368,20 +394,14 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
     return { min, max };
   }
 
-  getNewNumberFormatter() {
-    const numberFormatter = new NumberFormatter();
-    numberFormatter.smallNumberPrefixes = [];
-    return numberFormatter;
-  }
-
   private setYAxes(chart: XYChart) {
     const valueAxis: ValueAxis = chart.yAxes.push(new ValueAxis());
-    valueAxis.extraMax = 0.1;
+    valueAxis.extraMax = 0.15;
     valueAxis.maxZoomFactor = 10000000;
-    // valueAxis.strictMinMax = true;
     valueAxis.renderer.grid.template.align = 'right';
     valueAxis.numberFormatter = this.getNewNumberFormatter();
-    valueAxis.numberFormatter.numberFormat = '#a';
+    valueAxis.numberFormatter.numberFormat = '#';
+    valueAxis.strictMinMax = this.chartDataDisplay.strictMinMax;
     this.disableValueLineOnZero(valueAxis);
     if (!this.chartDataDisplay.xAxisLineShow)
       valueAxis.renderer.axis.children.values[1].disabled = true;
@@ -389,11 +409,10 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
     valueAxis.renderer.grid.template.strokeDasharray = this.chartDataDisplay.yAxisGridDashed ? '4,4' : '';
     valueAxis.renderer.labels.template.disabled = !this.chartDataDisplay.yAxisShowLabels;
     valueAxis.calculateTotals = true;
-    chart.events.on("ready", (ev) => {
-      console.log("valueAxis - minDefined",valueAxis.minDefined)
-      valueAxis.min = valueAxis.minDefined;
-    })
-    return valueAxis;
+    valueAxis.renderer.labels.template.adapter.add("textOutput", (v, t, k) => {
+      return this.numberFormatService.format(v, undefined, undefined, true);
+    });
+    this.valueAxis = valueAxis;
   }
 
   private disableValueLineOnZero(valueAxis) {
@@ -405,8 +424,6 @@ export class VerticalBarComponent implements AfterViewInit, OnDestroy, OnChanges
 
 }
 
-
-
 function compare(a, b, special?) {
   if (a == special)
     return -2;
@@ -416,14 +433,4 @@ function compare(a, b, special?) {
     return -1;
   else
     return 0;
-}
-
-function getRandomWord() {
-  let word = '';
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  for (let i = 0; i < 20; i++) {
-    const index = Math.floor(Math.random() * chars.length);
-    word += chars[index];
-  }
-  return word;
 }

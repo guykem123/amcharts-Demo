@@ -1,6 +1,10 @@
 .app {
   overflow-y: hidden;
 }
+.chart-container {
+  width: 500px;
+  height: 500px;
+}
 .app-content {
   flex-grow: 1;
   margin-bottom: 2px;
@@ -14,10 +18,14 @@
   bottom: 0px;
 }
 
+.charts-content{
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .main-app-cont div {
   margin: 10px;
 }
-
 
 .grid-container {
   width: 100%;
@@ -58,7 +66,6 @@
   padding: 5px;
 }
 
-
 .date-picker {
   padding-right: 16px;
 }
@@ -70,7 +77,6 @@
   width: 124px;
   padding-bottom: 7px;
   padding-top: 7px;
-
 }
 
 [nz-menu] {
@@ -88,6 +94,8 @@
   .dashboard-grid-view {
     display: flex;
     flex-wrap: wrap;
+    grid-template-rows: unset;
+    grid-template-columns: unset;
   }
   .full-width {
     margin: 16px;

@@ -8,9 +8,9 @@ import { ColorDetail } from '../../models/ColorDetail';
 import { ChartService } from '../../services/chartService/chart.service';
 import { SerieMetadata } from '../../models/SerieMetadata';
 import { NumberFormatService } from '../../services/numberFormatService/number-format.service';
-import { Subscription } from 'rxjs';
 import { LegendMarker } from '../../models/LegendMarker';
-
+import { of, Subscription } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-horizontal-bar',
@@ -20,7 +20,6 @@ import { LegendMarker } from '../../models/LegendMarker';
 export class HorizontalBarComponent implements AfterViewInit, OnChanges {
 
   @Input() chartId: string;
-  @Input() chartDivId: string;
   @Input() chartDataDisplay: XYChartsDisplayData;
   @Input() categoryType: any;
   @Input() showChartLegendDivide: boolean;
@@ -43,8 +42,10 @@ export class HorizontalBarComponent implements AfterViewInit, OnChanges {
     };
     options.autoSetClassName = true;
   }
+
   ngOnChanges(changes: SimpleChanges): void {
-    this.setChart();
+    if (this.chart)
+      this.setChart();
   }
 
   ngOnDestroy(): void {
@@ -63,21 +64,19 @@ export class HorizontalBarComponent implements AfterViewInit, OnChanges {
   }
 
   setChart() {
+    if (this.chart) {
+      this.disposeChart();
+    }
     if (this.chartDataDisplay && this.chartDataDisplay.data.length) {
-      if (!this.chart)
-        this.chart = create(this.chartDivId, XYChart);
-      else {
-        removeOldAxisData(this.chart);
-        removeOldSeries(this.chart);
-        this.series = [];
-      }
+      this.chart = create(this.chartId, XYChart);
       this.chart.zoomOutButton.disabled = true;
       this.chart.numberFormatter.smallNumberPrefixes = [];
       this.chart.data = this.chartDataDisplay.data.reverse();//the chart display the last first so we use the reverse function, especially for the "More" option
       this.setYAxes(this.chart);
       this.setXAxes(this.chart);
       this.setChartColors(this.chartDataDisplay.metadata.seriesMetadata);
-      this.chosenType = this.categoryType == "DATE" ? this.types.dateType : this.types.categoryType;
+      const categoryFirstValue = this.chartDataDisplay.data[0][this.chartDataDisplay.metadata.categoryAxisKey];
+      this.chosenType = categoryFirstValue.match(/^[0-9]+[\-.][0-9]+[\-.][0-9]+$/g) ? this.types.dateType : this.types.categoryType;
       this.chartService.setToolTip(this.chartDataDisplay, this.chartDataDisplay.data,
         this.chart.colors.list, this.chartDataDisplay.metadata.seriesMetadata, this.chosenType.class);
       const series = this.chartDataDisplay.metadata.seriesMetadata;
@@ -141,6 +140,7 @@ export class HorizontalBarComponent implements AfterViewInit, OnChanges {
     categoryAxis.renderer.cellStartLocation = this.chartDataDisplay.cellStartLocation;
     categoryAxis.renderer.cellEndLocation = this.chartDataDisplay.cellEndLocation;
     categoryAxis.renderer.line.strokeOpacity = 1;
+    categoryAxis.renderer.labels.template.tooltipPosition = "pointer";
 
     categoryAxis.renderer.labels.template.events.on('sizechanged', (ev) => {
       const labelTemplate = categoryAxis.renderer.labels.template;
@@ -192,17 +192,16 @@ export class HorizontalBarComponent implements AfterViewInit, OnChanges {
         return v;
       });
 
-      valueLabel.label.events.on("sizechanged", (ev) => {
+      valueLabel.label.events.on("sizechanged", async (ev) => {
         const label = ev.target;
-        if (!label.availableHeight)
-          return;
-        else if (label.availableHeight >= 10) {
+        const height = await this.setLabelHeight(label);
+        if (height >= 10) {
           valueLabel.fontSize = 9;
         }
-        else if (label.availableHeight >= 6) {
+        else if (height >= 6) {
           valueLabel.fontSize = 7;
         }
-        else if (label.availableHeight >= 4) {
+        else if (height >= 4) {
           valueLabel.fontSize = 6;
         }
         else {
@@ -211,10 +210,23 @@ export class HorizontalBarComponent implements AfterViewInit, OnChanges {
       });
     }
   }
+  private async setLabelHeight(label) {
+    if (!label.availableHeight)
+      return undefined;
+    let height = Math.round(label.availableHeight);
+    if (!height) {
+      await of(null).pipe(delay(1000)).toPromise();
+      height = Math.round(label.availableHeight);
+    }
+    return height;
+  }
+
   private setXAxes(chart: XYChart) {
     let valueAxis = chart.xAxes.push(new ValueAxis());
     valueAxis.renderer.grid.template.strokeOpacity = 0;
     valueAxis.extraMax = 0.1;
+    valueAxis.strictMinMax = true;
+    valueAxis.min = 0;
     if (!this.chartDataDisplay.xAxisLineShow) {
       valueAxis.renderer.axis.children.values[2].disabled = true;
     }
@@ -236,18 +248,4 @@ function compare(a, b, isOverrideHigher) {
     return -1;
   else
     return 0;
-}
-
-function removeOldSeries(chart: any) {
-  const series = [...chart.series._values];
-  for (let i = 0; i < series.length; i++) {
-    chart.series.removeIndex(0);
-  }
-}
-
-function removeOldAxisData(chart: any) {
-  if (chart.xAxes._values.length)
-    chart.xAxes.removeIndex(0);
-  if (chart.yAxes._values.length)
-    chart.yAxes.removeIndex(0);
 }

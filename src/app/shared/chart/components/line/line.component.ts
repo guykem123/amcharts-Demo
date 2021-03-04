@@ -1,6 +1,6 @@
 import { Component, OnInit, OnChanges, AfterViewInit, Input, HostListener, OnDestroy, EventEmitter, Output, ChangeDetectorRef, SimpleChanges, } from '@angular/core';
-import { create, color, net, options, Container, percent, useTheme, DateFormatter } from '@amcharts/amcharts4/core';
-import { XYChart, ValueAxis, CategoryAxis, XYCursor, LineSeries, DateAxis, XYSeries } from '@amcharts/amcharts4/charts';
+import { create, color, net, options, Container, percent, useTheme, DateFormatter, NumberFormatter } from '@amcharts/amcharts4/core';
+import { XYChart, ValueAxis, CategoryAxis, XYCursor, LineSeries, DateAxis, XYSeries, Legend } from '@amcharts/amcharts4/charts';
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import { XYChartsDisplayData } from '../../models/XYChartsDisplayData';
 import { IChartComponent } from '../../models/IChartComponent';
@@ -10,15 +10,15 @@ import { ColorDetail } from '../../models/ColorDetail';
 import { SerieMetadata } from '../../models/SerieMetadata';
 import { Subscription } from 'rxjs';
 import { LegendMarker } from '../../models/LegendMarker';
+import { NumberFormatService } from '../../services/numberFormatService/number-format.service';
 @Component({
   selector: 'app-line',
   templateUrl: './line.component.html',
   styleUrls: ['./line.component.css']
 })
-export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent {
+export class LineComponent implements AfterViewInit, OnChanges, OnDestroy, IChartComponent {
 
   @Input() chartId: string;
-  @Input() chartDivId: string;
   @Input() chartDataDisplay: XYChartsDisplayData;
   @Input() categoryType: any;
   @Input() showChartLegendDivide: boolean;
@@ -36,6 +36,7 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
 
   constructor(
     private chartService: ChartService,
+    private numberFormatService: NumberFormatService,
   ) {
     // useTheme(am4themes_animated);
     this.types = {
@@ -44,9 +45,12 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
     };
     options.autoSetClassName = true;
     this.dataIsInsufficient = false;
-    this.onSideBarChange();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.chart)
+      this.setChart();
+  }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
@@ -55,11 +59,6 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
 
   ngAfterViewInit(): void {
     this.setChart();
-  }
-
-
-  private onSideBarChange() {
-   
   }
 
 
@@ -75,13 +74,12 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
         });
         return;
       }
-      this.chart = create(this.chartDivId, XYChart);
-      console.log("create", this.chart.id);
+      this.chart = create(this.chartId, XYChart);
       this.chart.zoomOutButton.disabled = true;
       this.chart.numberFormatter.smallNumberPrefixes = [];
       this.chart.data = this.chartDataDisplay.data;
       const categoryFirstValue = this.chartDataDisplay.data[0][this.chartDataDisplay.metadata.categoryAxisKey];
-      this.chosenType = this.categoryType == "DATE" && Date.parse(categoryFirstValue) ? this.types.dateType : this.types.categoryType;
+      this.chosenType = categoryFirstValue.match(/^[0-9]+[\-.][0-9]+[\-.][0-9]+$/g) ? this.types.dateType : this.types.categoryType;
       this.setYAxes(this.chart);
       this.setXAxes(this.chart);
       this.setChartColors(this.chartDataDisplay.metadata.seriesMetadata);
@@ -96,6 +94,7 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
         this.createSeries(meta.key, meta.title, meta.tooltip, meta.dashLine,
           this.chart, meta.color, serieColorHex);
       }
+      this.chartService.addLegend(this.chart, this);
       this.chartService.setPdfFunc(this.chartId, this.chart);
       this.sortTheChartCategoryValues();
       this.chart.events.on('ready', (ev) => {// sort by date
@@ -127,7 +126,6 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
   }
 
   private disposeChart() {
-    console.log("dispose", this.chart);
     this.chart?.dispose();
     delete this.chart;
   }
@@ -169,7 +167,6 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
     this.setLabelForAxis(xAxis);
     this.setXAxisTooltipFormat(xAxis);
     chart.cursor = new XYCursor();
-    chart.cursor.numberFormatter.numberFormat = "#.0a";
     chart.cursor.lineX.disabled = !this.chartDataDisplay.showCursor;
     chart.cursor.lineY.disabled = !this.chartDataDisplay.showCursor;
     xAxis.cursorTooltipEnabled = this.chartDataDisplay.showCursor;
@@ -233,16 +230,30 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
   private setYAxes(chart: XYChart) {
     let valueAxis: ValueAxis = chart.yAxes.push(new ValueAxis());
     valueAxis.renderer.grid.template.strokeOpacity = 0;
-    valueAxis.numberFormatter.numberFormat = "#.a";
+    valueAxis.numberFormatter.numberFormat = "#";
     valueAxis.strictMinMax = this.chartDataDisplay.strictMinMax;
     valueAxis.renderer.grid.template.disabled = !this.chartDataDisplay.yAxisShowGrid;
     valueAxis.renderer.labels.template.disabled = !this.chartDataDisplay.yAxisShowLabels;
-
+    if (!this.chartDataDisplay.strictMinMax)
+      valueAxis.min = 0;
     valueAxis.cursorTooltipEnabled = this.chartDataDisplay.showCursor;
     if (!this.chartDataDisplay.xAxisLineShow) {
       valueAxis.renderer.axis.children.values[1].disabled = true;
     }
-
+    if (this.chartDataDisplay.yAxisLineShow) {
+      valueAxis.renderer.line.strokeOpacity = 1;
+      valueAxis.renderer.line.strokeWidth = 1;
+      valueAxis.renderer.line.stroke = color("gray");
+      if (this.chartDataDisplay.showTicks)
+        valueAxis.renderer.ticks.template.disabled = false;
+      valueAxis.renderer.ticks.template.strokeOpacity = 1;
+      valueAxis.renderer.ticks.template.stroke = color("gray");
+      valueAxis.renderer.ticks.template.strokeWidth = 1;
+      valueAxis.renderer.ticks.template.length = 5;
+    }
+    valueAxis.renderer.labels.template.adapter.add("text", (v, t, k) => {
+      return this.numberFormatService.format(v, undefined, undefined, true);
+    });
   }
 
   setChartColors(seriesMetadata: SerieMetadata[]) {
@@ -251,3 +262,7 @@ export class LineComponent implements AfterViewInit, OnDestroy, IChartComponent 
   }
 
 }
+
+
+
+

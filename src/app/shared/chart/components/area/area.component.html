@@ -1,9 +1,15 @@
-<app-loading-data *ngIf="isRendering"></app-loading-data>
-<div *ngIf="dataIsInsufficient" class="chart-data-not-applicable">Area chart is not applicable</div>
-<div class="chart-container area-chart-container">
-    <div [id]="chartId" class="area-chart-element"></div>
-    <div class="legend-container">
-        <app-legend [series]="series"></app-legend>
+<div class="main-chart-container">
+    <div class="non-chart-container">
+        <app-loading-data *ngIf="isRendering"></app-loading-data>
+        <div *ngIf="dataIsInsufficient" class="chart-data-not-applicable">Line chart is not applicable</div>
     </div>
-    <div class="legend-container-svg" [id]="'legend'+chartId" [style.height.px]="legendHeight"></div>
+    <div class="chart-container display" [ngClass]="isRendering || dataIsInsufficient ? 'close':''">
+        <div [id]="chartId" class="chart-instance display"></div>
+        <nz-divider *ngIf="!isRendering && chartDataDisplay.showLegend && showChartLegendDivide" style="margin: 0px;">
+        </nz-divider>
+        <div class="legend-container" *ngIf="!isRendering && chartDataDisplay.showLegend">
+            <app-legend [series]="series"></app-legend>
+        </div>
+        <div class="legend-container-svg" [id]="'legend'+chartId" [style.height.px]="legendHeight"></div>
+    </div>
 </div>

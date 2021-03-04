@@ -68,7 +68,6 @@ export class DataService {
       "Project A": this.getRandomNumber(),
       "Project B": this.getRandomNumber(),
       "Project C": this.getRandomNumber(),
-      "Negative": (Math.floor(Math.random() * -10)),
     });
   }
 
@@ -85,10 +84,11 @@ export class DataService {
   }
 
   private getServiceData(year: string): ServiceData {
+    const value = 10;
     return ({
       year,
-      "Service A": (Math.floor(Math.random() * 10)),
-      "Service B": (Math.floor(Math.random() * 10)),
+      "Service A": value,
+      "Service B": value * -1,
     });
   }
 

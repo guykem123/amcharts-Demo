@@ -9,6 +9,7 @@ import { AxisType } from '../../models/AxisType';
 import { IChartComponent } from '../../models/IChartComponent';
 import { LegendMarker } from '../../models/LegendMarker';
 import { Subscription } from 'rxjs';
+import { NumberFormatService } from '../../services/numberFormatService/number-format.service';
 
 @Component({
   selector: 'app-area',
@@ -35,13 +36,13 @@ export class AreaComponent implements AfterViewInit, OnChanges, OnDestroy, IChar
 
   constructor(
     private chartService: ChartService,
+    private numberFormatService: NumberFormatService,
   ) {
     options.autoSetClassName = true;
     this.types = {
       dateType: { class: DateAxis, keyName: 'date', seriesKey: 'dateX', xAxisTooltip: "date.formatDate('MMM dd')" },
       categoryType: { class: CategoryAxis, keyName: 'category', seriesKey: 'categoryX', xAxisTooltip: "category" }
     };
-    
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -98,7 +99,7 @@ export class AreaComponent implements AfterViewInit, OnChanges, OnDestroy, IChar
       this.chart.zoomOutButton.disabled = true;
       this.chart.numberFormatter.smallNumberPrefixes = [];
       const categoryFirstValue = this.chartDataDisplay.data[0][this.chartDataDisplay.metadata.categoryAxisKey];
-      this.chosenType = this.categoryType == "DATE" && Date.parse(categoryFirstValue) ? this.types.dateType : this.types.categoryType;
+      this.chosenType = categoryFirstValue.match(/^[0-9]+[\-.][0-9]+[\-.][0-9]+$/g) ? this.types.dateType : this.types.categoryType;
       this.chart.data = this.chartDataDisplay.data;
       this.setYAxes(this.chart);
       this.setXAxes(this.chart);
@@ -116,7 +117,7 @@ export class AreaComponent implements AfterViewInit, OnChanges, OnDestroy, IChar
       this.chartService.addLegend(this.chart, this);
       this.chartService.setPdfFunc(this.chartId, this.chart);
       this.chart.events.on('ready', (ev) => {// sort by date
-        // this.isRendering = false;
+        this.isRendering = false;
         this.chartReady.emit();
       });
       this.chart.events.on('beforedatavalidated', (ev) => {// sort by date
@@ -268,7 +269,7 @@ export class AreaComponent implements AfterViewInit, OnChanges, OnDestroy, IChar
     const valueAxis: ValueAxis = chart.yAxes.push(new ValueAxis());
     valueAxis.extraMax = 0.1;
     valueAxis.renderer.grid.template.align = 'right';
-    valueAxis.numberFormatter.numberFormat = '#a';
+    valueAxis.numberFormatter.numberFormat = '#';
     valueAxis.strictMinMax = this.chartDataDisplay.strictMinMax;
     if (!this.chartDataDisplay.xAxisLineShow)
       valueAxis.renderer.axis.children.values[1].disabled = true;
@@ -277,6 +278,9 @@ export class AreaComponent implements AfterViewInit, OnChanges, OnDestroy, IChar
     valueAxis.renderer.labels.template.disabled = !this.chartDataDisplay.yAxisShowLabels;
     valueAxis.calculateTotals = true;
     valueAxis.cursorTooltipEnabled = this.chartDataDisplay.showCursor;
+    valueAxis.renderer.labels.template.adapter.add("text", (v, t, k) => {
+      return this.numberFormatService.format(v,undefined,undefined,true);
+    });
   }
 
 }

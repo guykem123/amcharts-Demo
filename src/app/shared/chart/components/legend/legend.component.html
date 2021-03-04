@@ -1,7 +1,9 @@
-<div class="legends-main-container">
-    <div class="legend-container">
+<div class="legends-main-container" #mainContainer>
+    <div class="app-legend-container" [style.width]="markerContentWidth">
         <div class="legend-marker" *ngFor="let serie of series">
-            <app-legend-marker [marker]="serie" (markerClicked)="onSerieSelected($event)"></app-legend-marker>
+            <app-legend-marker [textMaxWidth]="textMaxWidth" [markerMaxWidth]="markerMaxWidth" [marker]="serie"
+                (markerClicked)="onSerieSelected($event)">
+            </app-legend-marker>
         </div>
     </div>
 </div>

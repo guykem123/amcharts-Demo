@@ -8,7 +8,7 @@ import { XYChartsDisplayData } from 'src/app/shared/chart/models/XYChartsDisplay
 import { ChartService } from 'src/app/shared/chart/services/chartService/chart.service';
 import { WidgetComponent } from '../../model/WidgetComponent';
 
-
+let index = 0;
 
 @Component({
   selector: 'app-insight',
@@ -38,7 +38,7 @@ export class InsightComponent implements OnInit, OnDestroy {
   insightDataCancelId: number;
   chartIsReady: boolean;//whether the chart as been initialized yet or not
   isApiDataHaveAnyValue: boolean;//whether the data we get from the api have values e.g.  [{totalCost:-1},{totalCost:1}] == true
-
+  metadata: any;
   chartDivId: string;
   chartDataDisplay: XYChartsDisplayData;
   categoryType: any;
@@ -46,12 +46,21 @@ export class InsightComponent implements OnInit, OnDestroy {
 
   isChartPickOpen: boolean;
 
+  items = [{ name: 'set 1', value: "Projects" }, { name: 'set 2', value: "Services" }, { name: 'set 3', value: "Locations" }];
+  selectedItem: any = this.items[0];
+
+  types = [{ name: 'line', value: ChartTypeEnum.LINE }, { name: 'vertical', value: ChartTypeEnum.STACKED_VERTICAL_BAR }];
+  selectedType: any = this.types[0];
+
 
   stackVertDataOptions;
   dataDisplay;
   dataDisplayArea;
 
   currentComponentType: ChartTypeEnum;
+
+  chartTypesOptions: { name: string; }[];
+  selectedChartTypeOption: { name: ChartTypeEnum; };
 
   constructor(
     private chartService: ChartService,
@@ -63,10 +72,13 @@ export class InsightComponent implements OnInit, OnDestroy {
       { type: ChartTypeEnum.AREA, icon: "icon-area-chart" },
       { type: ChartTypeEnum.STACKED_VERTICAL_BAR, icon: "icon-vertical-chart" },
       { type: ChartTypeEnum.LINE, icon: "icon-line-chart" },
+      { type: ChartTypeEnum.HORIZONTAL_BAR, icon: "icon-line-chart" },
       // { type: ChartTypeEnum.PIE, icon: "icon-pie-chart" }, 
     ];
 
-    this.currentComponentType = ChartTypeEnum.STACKED_VERTICAL_BAR;
+    this.chartTypesOptions = this.chartTypes.map(x => ({ name: x.type }));
+
+
 
     this.chartId = "firstChart";
     this.chartDivId = "chartdivid";
@@ -75,8 +87,19 @@ export class InsightComponent implements OnInit, OnDestroy {
     this.dataDisplayArea = { ...this.stackVertDataOptions[0] };
     this.chartDataDisplay = this.dataService.verticalBarData.Projects;
     this.categoryType = "Nan";
+    this.selectedChartType = this.chartTypes[index].type;
+    this.selectedChartTypeOption = { name: this.chartTypes[index].type };
+    this.currentComponentType = this.chartTypes[index].type;
+    this.metadata = {};
+    index += 1;
   }
 
+  changeSelectChartType(name: ChartTypeEnum) {
+    this.selectedChartType = name;
+    this.currentComponentType = this.selectedChartType;
+    this.destroyChartComponent();
+    this.setInsight();
+  }
   changeIsChartPickOpenState() {
     this.isChartPickOpen = !this.isChartPickOpen;
   }
@@ -96,6 +119,26 @@ export class InsightComponent implements OnInit, OnDestroy {
     this.container.clear();
   }
 
+  onChange(ev) {
+    this.selectedItem = this.items[ev.target.options.selectedIndex];
+    this.chartDataDisplay = this.dataService.verticalBarData[this.selectedItem.value];
+  }
+
+  selectChartType(ev) {
+    // const type = this.types[ev.target.options.selectedIndex].value;
+    // this.charts[index]?.dispose();
+    // switch (type) {
+    //   case "line":
+    //     this.createLineChart(index);
+    //     break;
+    //   case "vert":
+    //     this.createVertChart(index);
+    //     break;
+
+    //   default:
+    //     break;
+    // }
+  }
   async ngOnInit() {
     await this.setInsight();
   }
@@ -104,6 +147,21 @@ export class InsightComponent implements OnInit, OnDestroy {
     this.setComponent(this.chartService.getComponent(this.currentComponentType), this.chartDataDisplay);
   }
 
+  get isLine() {
+    return this.selectedChartType === ChartTypeEnum.LINE;
+  }
+
+  get isHorizontalBar() {
+    return this.selectedChartType === ChartTypeEnum.HORIZONTAL_BAR;
+  }
+
+  get isVerticalBar() {
+    return this.selectedChartType === ChartTypeEnum.STACKED_VERTICAL_BAR || this.selectedChartType === ChartTypeEnum.VERTICAL_BAR;
+  }
+
+  get isArea() {
+    return this.selectedChartType === ChartTypeEnum.AREA;
+  }
 
   changeSelect(name) {
     this.chartDataDisplay = this.dataService.verticalBarData[name];
@@ -113,14 +171,27 @@ export class InsightComponent implements OnInit, OnDestroy {
   resetChartType(type) {
     this.isChartPickOpen = false;
     this.currentComponentType = type;
+    this.chartComponentInstance = undefined;
     this.setInsight();
+  }
+
+  onChartExpend(ev) {
+    // console.log(ev);
+  }
+
+  onChartReady(ev) {
+    console.log(ev);
   }
 
 
   //finally create a new chart component with its data
   private setComponent(chartComponent: any, XYChartData: XYChartsDisplayData) {
     if (this.chartComponentInstance) {//if the chart component already exist and we need to reset the data
-      this.destroyChartComponent();
+      this.chartComponentInstance.chartId = this.chartId;
+      this.chartComponentInstance.chartDataDisplay = XYChartData;
+      this.chartComponentInstance.showChartLegendDivide = true;
+      this.chartComponentInstance.setChart();
+      return;
     }
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(chartComponent);
     this.chartComponentInstance = this.container.createComponent<any>(componentFactory).instance;

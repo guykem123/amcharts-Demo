@@ -1,0 +1,6 @@
+<div class="marker-container" [style.width]="markerMaxWidth+'px'" [ngClass]="{'hidden':!currentSerieShow}">
+    <div class="marker-content" (click)="onSerieClicked()">
+        <div class="color-box" [style.background]="currentSerieShow? marker.color:''"></div>
+        <div class="marker-serie-name" [style.maxWidth]="textMaxWidth+'px'" [title]="marker.name">{{marker.name}}</div>
+    </div>
+</div>

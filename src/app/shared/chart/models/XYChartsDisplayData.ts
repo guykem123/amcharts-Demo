@@ -11,13 +11,16 @@ export class XYChartsDisplayData {
         categoryAxisKey: string;
         seriesMetadata: SerieMetadata[];
     };
+    isCategoryTypeDate: boolean;
     showLegend: boolean = true;
     legendPosition: LegendPosition = 'bottom';
     xAxisShowGrid: boolean = true;
     showCursor: boolean = true;
     xAxisGridDashed: boolean = false; // if the grid line should be dashed
     xAxisShowLabels: boolean = true;
+    showTicks: boolean = false;
     xAxisLineShow: boolean = true;
+    yAxisLineShow: boolean = true;
     yAxisShowLabels: boolean = true;
     showTooltip: boolean = true;
     yAxisShowGrid: boolean = true;
@@ -28,7 +31,6 @@ export class XYChartsDisplayData {
     cellStartLocation: number; // num between 0 - 1
     cellEndLocation: number; // num between 0 - 1
     lineStrokeWidth: number = 1;
-  isCategoryTypeDate: boolean;
     constructor() {
         this.metadata = {
             categoryAxisKey: undefined,

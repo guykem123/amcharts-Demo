@@ -5,8 +5,8 @@
             {{currentSelected?.name}}
         </span>
         <div *ngIf="isOpen" class="options-container">
-            <div *ngFor="let op of options" class="options-text">
-                <span (click)="selectItem(op)">{{op.name}}</span>
+            <div *ngFor="let op of options" (click)="selectItem(op)" class="options-text">
+                <span>{{op.name}}</span>
             </div>
         </div>
 

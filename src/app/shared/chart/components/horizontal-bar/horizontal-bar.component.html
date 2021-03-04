@@ -1,6 +1,14 @@
-<div class="chart-container horiz-chart-container">
-    <div class="horiz-chart-element" [id]="chartDivId"></div>
-    <!-- <div class="legend-container" *ngIf="!isRendering && chartDataDisplay.showLegend">
-        <app-legend [series]="series"></app-legend>
-    </div> -->
+<div class="main-chart-container">
+    <div class="non-chart-container">
+        <app-loading-data *ngIf="isRendering"></app-loading-data>
+    </div>
+    <div class="chart-container display" [ngClass]="isRendering ? 'close':''">
+        <div [id]="chartId" class="chart-instance display" ></div>
+        <nz-divider *ngIf="!isRendering && chartDataDisplay.showLegend && showChartLegendDivide" style="margin: 0px;">
+        </nz-divider>
+        <div class="legend-container" *ngIf="!isRendering && chartDataDisplay.showLegend">
+            <app-legend [series]="series"></app-legend>
+        </div>
+        <div class="legend-container-svg" [id]="'legend'+chartId" ></div>
+    </div>
 </div>

@@ -3,18 +3,12 @@
   justify-content: center;
 }
 
-.legend-container {
+.app-legend-container {
   display: flex;
   flex-wrap: wrap;
 }
 
 .legend-marker {
-  padding: 3px;
-  margin: 3px;
-  cursor: pointer;
-  flex: 1 1 0;
+  margin: 5px;
 }
 
-.legend-marker:hover {
-  background-color: #f5f5f5;
-}

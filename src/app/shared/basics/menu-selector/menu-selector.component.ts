@@ -15,10 +15,12 @@ export class MenuSelectorComponent implements OnInit {
   isOpen: boolean;
 
 
-  constructor() { }
+  constructor() {
+   
+   }
 
   ngOnInit(): void {
-
+    console.log(this.options)
   }
 
   onMenuSelectedClick() {
@@ -26,6 +28,7 @@ export class MenuSelectorComponent implements OnInit {
   }
 
   selectItem(item) {
+    console.log(item)
     this.currentSelected = item;
     this.selectedItem.emit(item.name);
   }
